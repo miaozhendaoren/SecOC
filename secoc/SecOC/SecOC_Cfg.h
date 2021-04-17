@@ -8,7 +8,7 @@
 
 #define RX_SINGLE_IPDU 1
 #define RX_COLLECTION_IPDU 1
-#define RECEPTION_QUEUE_SIZE 1    //接收队列长度
+#define RECEPTION_QUEUE_SIZE 1    //鎺ユ敹闃熷垪闀垮害
 
 
 #define SECOC_ERROR_DETECT STD_OFF

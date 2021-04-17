@@ -40,7 +40,7 @@ typedef struct{
 //T-SW-COMPOSITION-PROTOTYPE
 	//0..*
 
-}EcucPartition_type;  //Ó¦ÔÚecu_cfg.cÖĞ
+}EcucPartition_type;  //åº”åœ¨ecu_cfg.cä¸­
 
 
 
@@ -98,7 +98,7 @@ typedef struct{
 //	const CsmQueue_type *const CsmJobQueueRef;
 //	//1
 	
-}CsmJob_type; //´Ë½á¹¹Ìå¿ÉÄÜÔÚcsmÄ£¿éÖĞ
+}CsmJob_type; //æ­¤ç»“æ„ä½“å¯èƒ½åœ¨csmæ¨¡å—ä¸­
 
 
 //typedef struct{
@@ -127,7 +127,7 @@ typedef struct{
 //	//0..*
 	
 	
-}Pdu_type;   //´Ë½á¹¹¿ÉÄÜ´æÔÚpduÄ£¿éÖĞ
+}Pdu_type;   //æ­¤ç»“æ„å¯èƒ½å­˜åœ¨pduæ¨¡å—ä¸­
 
 typedef struct{
 	SecOCPduType_type SecOCPduType;
@@ -240,7 +240,7 @@ typedef struct{
 	uint64 SecOCMainFunctionPeriodTx; //[0..inf]
 	//1
 	
-	uint8 *SecOCMaxAlignScalarType;  //String  ÈçºÎ±íÊ¾
+	uint8 *SecOCMaxAlignScalarType;  //String  å¦‚ä½•è¡¨ç¤º
 	//1
 	
 	boolean SecOCOverrideStatusWithDataId;
@@ -383,7 +383,7 @@ typedef struct{
 
 
 typedef struct{
-	SecOCQueryFreshnessValue_type SecOCPduType;		//[SECOC_IFPDU/SECOC_TPPDU] Ã¶¾ÙÀàĞÍ
+	SecOCQueryFreshnessValue_type SecOCPduType;		//[SECOC_IFPDU/SECOC_TPPDU] æšä¸¾ç±»å‹
 	//1
 
 	const SecOCPdu_type * const SecOCRxAuthenticLayerPduRef;
@@ -407,7 +407,7 @@ typedef struct{
 
 
 
-}SecOCRxPduSecuredArea_type;  //¾ö¶¨ÄÄ¶Î²ÎÓë¼ÆËãmac  Èô²»´æÔÚÔòÈ«²¿authentic
+}SecOCRxPduSecuredArea_type;  //å†³å®šå“ªæ®µå‚ä¸è®¡ç®—mac  è‹¥ä¸å­˜åœ¨åˆ™å…¨éƒ¨authentic
 //0..1
 
 
@@ -440,7 +440,7 @@ typedef struct{
 	uint8 SecOCFreshnessValueTruncLength;		//[0..64](default value --)
 	//1
 
-	SecOCQueryFreshnessValue_type SecOCReceptionOverflowStrategy;		//[QUEUE/REJECT/REPLACE] Êı¾İÀàĞÍ
+	SecOCQueryFreshnessValue_type SecOCReceptionOverflowStrategy;		//[QUEUE/REJECT/REPLACE] æ•°æ®ç±»å‹
 	//1
 
 	uint16 SecOCReceptionQueueSize;		//[1..65535](default value --)
@@ -449,7 +449,7 @@ typedef struct{
 	boolean SecOCUseAuthDataFreshness;		//(default value false)
 	//1
 
-	SecOCQueryFreshnessValue_type SecOCVerificationStatusPropagationMode;		//[BOTH/FAILURE_ONLY/NONE] Ã¶¾ÙÀàĞÍ
+	SecOCQueryFreshnessValue_type SecOCVerificationStatusPropagationMode;		//[BOTH/FAILURE_ONLY/NONE] æšä¸¾ç±»å‹
 	//1
 
 	const CsmJob_type * const SecOCRxAuthServiceConfigRef;		//Symbolic name reference to [ CsmJob ]
