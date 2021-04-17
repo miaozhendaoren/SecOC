@@ -20,7 +20,7 @@
 
 `SecOCRxPduProcessing_type`: `VAR(SecOCRxPduProcessing_type, SECOC_TYPES_VAR)`
 
-
+</br>
 
 `const PduInfoType*`: `P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA)`
 
@@ -30,7 +30,7 @@
 
 `const SecOC_ConfigType *`: `P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA)`
 
-
+</br>
 
 `Std_VersionInfoType*`: `P2VAR(Std_VersionInfoType, AUTOMATIC, SECOC_APPL_DATA)`
 
