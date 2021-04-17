@@ -39,11 +39,11 @@
 #define P2CONST(ptrtype, memclass, ptrclass)                    const ptrtype ptrclass * memclass
 
 /* */
-#define CONSTP2VAR (ptrtype, memclass, ptrclass)  ptrtype* const memclass ptrclass
+#define CONSTP2VAR(ptrtype, memclass, ptrclass)  ptrtype* const memclass ptrclass
 
 /* 声明和定义访问常量的常量指针定义CONSTP2CONST宏。
 指针本身不可修改(固定地址)。指针的目标不可修改(只读)。 */
-#define  CONSTP2CONST (ptrtype, memclass, ptrclass) const ptrtype * const memclass ptrclass
+#define CONSTP2CONST(ptrtype, memclass, ptrclass) const ptrtype * const memclass ptrclass
 
 /* 指向函数的指针的类型定义定义P2FUNC宏。 */
 #define P2FUNC(rettype, ptrclass, fctname) rettype (*ptrclass fctname)

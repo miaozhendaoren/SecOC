@@ -76,14 +76,26 @@ OC_INIT.
 Within SecOC_Init, the module shall initialize all internal global variables and the
 buffers of the SecOC I-PDUs.
 */
-void SecOC_Init (const SecOC_ConfigType* config){
+// ******************FUNCTION***********************
+// void SecOC_Init(const SecOC_ConfigType *config) {
+// 	tmpSecOCGeneral = config->general;
+// 	tmpSecOCTxPduProcessing = config->secOCTxPduProcessings;
+// 	tmpSecOCRxPduProcessing = config->secOCRxPduProcessings;
+// 	//	initial(variables);
+// 	//	if(!success){
+// 	//		SecOCState = SecOC_E_UNINIT;
+// 	//	}
+// 	_secOCState = SECOC_INIT;
+// }
+FUNC(void, SECOC_CODE)
+SecOC_Init(P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA) config) {
 	tmpSecOCGeneral = config->general;
 	tmpSecOCTxPduProcessing = config->secOCTxPduProcessings;
 	tmpSecOCRxPduProcessing = config->secOCRxPduProcessings;
-//	initial(variables);
-//	if(!success){
-//		SecOCState = SecOC_E_UNINIT;
-//	}
+	//	initial(variables);
+	//	if(!success){
+	//		SecOCState = SecOC_E_UNINIT;
+	//	}
 	_secOCState = SECOC_INIT;
 }
 
@@ -92,63 +104,113 @@ This service stops the secure onboard communication. All buffered I-PDU are
 removed and have to be obtained again, if needed, after SecOC_Init has been
 called. By a call to SecOC_DeInit the AUTOSAR SecOC module is put into a not
 initialized state (SecOC_UNINIT).*/
-void SecOC_DeInit (void){
+// ******************FUNCTION***********************
+// void SecOC_DeInit (void) {
+// 	_secOCState = SECOC_UNINIT;
+// }
+FUNC(void, SECOC_CODE)
+SecOC_DeInit(void) {
 	_secOCState = SECOC_UNINIT;
 }
 
 /*Returns the version information of this module.
  *
  */
-void SecOC_GetVersionInfo (Std_VersionInfoType* versioninfo) //0x02 同步 可重入
+// ******************FUNCTION***********************
+// void SecOC_GetVersionInfo (Std_VersionInfoType* versioninfo) //0x02 同步 可重入
+// {
+// 	VALIDATE_STATE_INIT();
+// 	memcpy(versionInfo, &_SecOC_VersionInfo, sizeof(Std_VersionInfoType));
+// 	return;
+// }
+FUNC(void, SECOC_CODE)
+SecOC_GetVersionInfo(P2VAR(Std_VersionInfoType, AUTOMATIC, SECOC_APPL_DATA) versioninfo) //0x02 同步 可重入
 {
 	VALIDATE_STATE_INIT();
 	memcpy(versionInfo, &_SecOC_VersionInfo, sizeof(Std_VersionInfoType));
 	return;
 }
 
-
-
-
+// ******************FUNCTION***********************
 //0x49 同步 可重入不同的PduId。不可重入相同的PduId。 参考7.4
 //E_OK: 传输请求已被接受。
 //E_NOT_OK: 传输请求未被接受
-Std_ReturnType SecOC_IfTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr ){
-//	if(direct || triggered transmission){
-//
-//		prepare();
-//		copyBuffer();  //时序图有时为copy()
-//	}else if(tp trans){
-//		prepare();
-//		copy();
-//	}
-//
-//	if(succcess){  //prepare 和 copy正确
-//		return E_OK;
-//	}else{
-//		return E_NOT_OK;
-//	}
+// Std_ReturnType SecOC_IfTransmit (PduIdType TxPduId, const PduInfoType* PduInfoPtr) {
+// //	if(direct || triggered transmission){
+// //
+// //		prepare();
+// //		copyBuffer();  //时序图有时为copy()
+// //	}else if(tp trans){
+// //		prepare();
+// //		copy();
+// //	}
+// //
+// //	if(succcess){  //prepare 和 copy正确
+// //		return E_OK;
+// //	}else{
+// //		return E_NOT_OK;
+// //	}
+// 	VALIDATE_STATE_INIT();
+// 	if(TxPduId>=SECOC_NUM_OF_TX_IPDU){
+// 		return E_NOT_OK;  //非secoc内txpduid
+// 	}
+// 	SecOCintermidate[TxPduId].adatachar = PduInfoPtr->SduDataPtr;
+// 	SecOCintermidate[TxPduId].len = PduInfoPtr->SduLength;
+// 	return E_OK;
+
+// //	uint8 idx=0;
+// //	for(idx; idx<SECOC_NUM_OF_TX_IPDU; idx++){
+// //		SecOCTxPduProcessing_type cur = tmpSecOCTxPduProcessing[num];
+// //		if(cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduId == TxPduId){
+// //			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduDataPtr=PduInfoPtr->SduDataPtr;
+// //			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->MetaDataPtr=PduInfoPtr->MetaDataPtr;
+// //			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduLength=PduInfoPtr->SduLength;
+// //			return E_OK;
+// //		}//覆盖
+// //	}
+// //	return E_NOT_OK;
+
+// }
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_IfTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr)
+{
+	//	if(direct || triggered transmission){
+	//
+	//		prepare();
+	//		copyBuffer();  //时序图有时为copy()
+	//	}else if(tp trans){
+	//		prepare();
+	//		copy();
+	//	}
+	//
+	//	if(succcess){  //prepare 和 copy正确
+	//		return E_OK;
+	//	}else{
+	//		return E_NOT_OK;
+	//	}
 	VALIDATE_STATE_INIT();
-	if(TxPduId>=SECOC_NUM_OF_TX_IPDU){
-		return E_NOT_OK;  //非secoc内txpduid
+	if (TxPduId >= SECOC_NUM_OF_TX_IPDU)
+	{
+		return E_NOT_OK; //非secoc内txpduid
 	}
 	SecOCintermidate[TxPduId].adatachar = PduInfoPtr->SduDataPtr;
 	SecOCintermidate[TxPduId].len = PduInfoPtr->SduLength;
 	return E_OK;
 
-//	uint8 idx=0;
-//	for(idx; idx<SECOC_NUM_OF_TX_IPDU; idx++){
-//		SecOCTxPduProcessing_type cur = tmpSecOCTxPduProcessing[num];
-//		if(cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduId == TxPduId){
-//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduDataPtr=PduInfoPtr->SduDataPtr;
-//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->MetaDataPtr=PduInfoPtr->MetaDataPtr;
-//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduLength=PduInfoPtr->SduLength;
-//			return E_OK;
-//		}//覆盖
-//	}
-//	return E_NOT_OK;
-
+	//	uint8 idx=0;
+	//	for(idx; idx<SECOC_NUM_OF_TX_IPDU; idx++){
+	//		SecOCTxPduProcessing_type cur = tmpSecOCTxPduProcessing[num];
+	//		if(cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduId == TxPduId){
+	//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduDataPtr=PduInfoPtr->SduDataPtr;
+	//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->MetaDataPtr=PduInfoPtr->MetaDataPtr;
+	//			cur.SecOCTxAuthenticPduLayer.SecOCTxAuthenticLayerPduRef->SduLength=PduInfoPtr->SduLength;
+	//			return E_OK;
+	//		}//覆盖
+	//	}
+	//	return E_NOT_OK;
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_TpTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr ){
 	VALIDATE_STATE_INIT();
 	const PduInfoType* info = secoctmp;
@@ -166,6 +228,7 @@ Std_ReturnType SecOC_TpTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoP
 
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_IfCancelTransmit (PduIdType TxPduId ){
 //0x4a 同步 可重入不同的PduId。不可重入相同的PduId。
 //E_OK:目标模块成功执行取消。
@@ -174,6 +237,7 @@ Std_ReturnType SecOC_IfCancelTransmit (PduIdType TxPduId ){
 
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_TpCancelTransmit ( PduIdType TxPduId )
 {
 //0x4a 同步 可重入不同的PduId。不可重入相同的PduId。
@@ -181,7 +245,7 @@ Std_ReturnType SecOC_TpCancelTransmit ( PduIdType TxPduId )
 //E_NOT_OK: 目标模块拒绝取消。
 }
 
-
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_TpCancelReceive ( PduIdType RxPduId )
 {
 //0x4c 同步 不可重入
@@ -191,7 +255,7 @@ Std_ReturnType SecOC_TpCancelReceive ( PduIdType RxPduId )
 }
 
 //Optional Interface
-
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_VerifyStatusOverride ( 
 	uint16 ValueID,
 	SecOC_OverrideStatusType overrideStatus,
@@ -205,6 +269,7 @@ Std_ReturnType SecOC_VerifyStatusOverride (
 
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_SendDefaultAuthenticationInformation ( 
 	uint16 FreshnessValueID, 
 	boolean sendDefaultAuthenticationInformation 
@@ -217,6 +282,7 @@ Std_ReturnType SecOC_SendDefaultAuthenticationInformation (
 
 
 //回调通知
+// ******************FUNCTION***********************
 //提供空间存储要接收到的要处理的报文数据，将报文数据保存到指定空间中
 void SecOC_RxIndication ( PduIdType RxPduId, const PduInfoType* PduInfoPtr ){
 
@@ -239,6 +305,7 @@ void SecOC_RxIndication ( PduIdType RxPduId, const PduInfoType* PduInfoPtr ){
 
 }
 
+// ******************FUNCTION***********************
 void SecOC_TpRxIndication ( PduIdType id, Std_ReturnType result ){
 	VALIDATE_STATE_INIT();
 	empty();
@@ -249,6 +316,7 @@ void SecOC_TpRxIndication ( PduIdType id, Std_ReturnType result ){
 	}
 }
 
+// ******************FUNCTION***********************
 void SecOC_TxConfirmation( PduIdType TxPduId, Std_ReturnType result ){
 	VALIDATE_STATE_INIT();
 	if(result == E_OK){
@@ -261,6 +329,7 @@ void SecOC_TxConfirmation( PduIdType TxPduId, Std_ReturnType result ){
 
 }
 
+// ******************FUNCTION***********************
 void SecOC_TpTxConfirmation ( PduIdType TxPduId, Std_ReturnType result ){
 	VALIDATE_STATE_INIT();
 
@@ -280,6 +349,7 @@ void SecOC_TpTxConfirmation ( PduIdType TxPduId, Std_ReturnType result ){
 	}
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_TriggerTransmit ( PduIdType TxPduId, PduInfoType* PduInfoPtr ){
 	VALIDATE_STATE_INIT();
 
@@ -298,6 +368,7 @@ Std_ReturnType SecOC_TriggerTransmit ( PduIdType TxPduId, PduInfoType* PduInfoPt
 
 }
 
+// ******************FUNCTION***********************
 BufReq_ReturnType SecOC_CopyRxData ( PduIdType id, const PduInfoType* info, PduLengthType* bufferSizePtr)   //输出
 {
 	/*copyData();
@@ -333,7 +404,7 @@ BufReq_ReturnType SecOC_CopyRxData ( PduIdType id, const PduInfoType* info, PduL
 
 }
 
-
+// ******************FUNCTION***********************
 BufReq_ReturnType SecOC_CopyTxData ( PduIdType id, const PduInfoType* info, const RetryInfoType* retry, PduLengthType* availableDataPtr)  
 {
 
@@ -356,7 +427,7 @@ BufReq_ReturnType SecOC_CopyTxData ( PduIdType id, const PduInfoType* info, cons
 
 
 
-
+// ******************FUNCTION***********************
 BufReq_ReturnType SecOC_StartOfReception ( PduIdType id, const PduInfoType* info, PduLengthType TpSduLength, PduLengthType* bufferSizePtr ){
 	VALIDATE_STATE_INIT();
 	prepare();
@@ -393,8 +464,7 @@ BufReq_ReturnType SecOC_StartOfReception ( PduIdType id, const PduInfoType* info
 		}//  BUFREQ_E_BUSY/ BUFREQ_E_OVFL*/
 }
 
-
-
+// ******************FUNCTION***********************
 //调出定义
 Std_ReturnType SecOC_GetRxFreshness ( 
 	uint16 SecOCFreshnessValueID, 
@@ -414,6 +484,7 @@ Std_ReturnType SecOC_GetRxFreshness (
 
 }
 
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_GetRxFreshnessAuthData ( 
 	uint16 SecOCFreshnessValueID, 
 	const uint8* SecOCTruncatedFreshnessValue, 
@@ -432,7 +503,7 @@ Std_ReturnType SecOC_GetRxFreshnessAuthData (
 //SecOC使用该接口来获取当前的新鲜度值。
 }
 
-
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_GetTxFreshness ( 
 	uint16 SecOCFreshnessValueID, 
 	uint8* SecOCFreshnessValue,    //输出
@@ -445,7 +516,8 @@ Std_ReturnType SecOC_GetTxFreshness (
 //E_BUSY：新鲜度信息暂时无法提供。
 //这个API从数组(SecOCFreshnessValue)第一个字节的最有效位以大端字节格式返回新鲜度值。
 }
-	
+
+// ******************FUNCTION***********************
 Std_ReturnType SecOC_GetTxFreshnessTruncData ( 
 	uint16 SecOCFreshnessValueID, 
 	uint8* SecOCFreshnessValue, 
@@ -461,6 +533,7 @@ Std_ReturnType SecOC_GetTxFreshnessTruncData (
 //SecOC使用这个接口来获取当前的新鲜度值。接口函数还提供了在Secured I-PDU中传输的截断新鲜度。
 }
 
+// ******************FUNCTION***********************
 void SecOC_SPduTxConfirmation ( 
 	uint16 SecOCFreshnessValueID 
 )
@@ -477,6 +550,7 @@ void SecOC_SPduTxConfirmation (
 
 //预定功能
 
+// ******************FUNCTION***********************
 /*SECOC 未初始化 调用此函数将直接返回，报错（可选）
  * 由SecOCMainFunctionPeriodTx 进行配置
  */
@@ -500,7 +574,7 @@ void SecOC_MainFunctionTx ( void )
 
 }
 
-
+// ******************FUNCTION***********************
 /*SECOC 未初始化 调用此函数将直接返回，报错（可选）
  * 由SecOCMainFunctionPeriodRx 进行配置
  */
@@ -581,6 +655,7 @@ void SecOC_MainFunctionRx ( void )
 //	}
 //}
 
+// ******************FUNCTION***********************
 void authenticate(SecOCintermidate_type SecOCintermidate,  PduInfoType* PduInfoPtr){
 
 	uint8 pduid = SecOCintermidate.SecOCTxPduId;
@@ -670,7 +745,7 @@ void authenticate(SecOCintermidate_type SecOCintermidate,  PduInfoType* PduInfoP
 
 }
 
-
+// ******************FUNCTION***********************
 void verify(SecOCintermidateRx_type SecOCintermidatRx, VerificationResultType verificationResult, SecOCRxPduProcessing_type curSecOCRxPduProcessing){
 
 	uint8 idx = 0;
@@ -769,6 +844,7 @@ void verify(SecOCintermidateRx_type SecOCintermidatRx, VerificationResultType ve
 
 }
 
+// ******************FUNCTION***********************
 void SecOC_VerificationStatusCallout (SecOC_VerificationStatusType verificationStatus){
 
 }

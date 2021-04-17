@@ -3,7 +3,8 @@
 #define _SECOC_H_
 
 #include "SecOC_Cfg.h"
-
+#include "../../Compiler.h"
+#include "../../Compiler_Cfg.h"
 
 
 
@@ -28,228 +29,358 @@
 
 
 
-typedef struct { //ÌØ¶¨ÊµÏÖÊı¾İ½á¹¹      ÅäÖÃSecOCÄ£¿éÊı¾İ½á¹¹
+typedef struct { //ç‰¹å®šå®ç°æ•°æ®ç»“æ„      é…ç½®SecOCæ¨¡å—æ•°æ®ç»“æ„
 	const SecOCGeneral_type general;
 	const SecOCTxPduProcessing_type* secOCTxPduProcessings;
 	const SecOCRxPduProcessing_type* secOCRxPduProcessings;
 }SecOC_ConfigType;
 
 
-typedef enum {   //SecOC×´Ì¬
-	SECOC_UNINIT,   //SecOCÎ´³õÊ¼»¯
-	SECOC_INIT		//SecOC³õÊ¼»¯
+typedef enum {   //SecOCçŠ¶æ€
+	SECOC_UNINIT,   //SecOCæœªåˆå§‹åŒ–
+	SECOC_INIT		//SecOCåˆå§‹åŒ–
 }SecOC_StateType;
 
 
-SecOCMainFunctionPeriodRx; //½ÓÊÕÖÜÆÚ
-SecOCMainFunctionPeriodTx;  //·¢ËÍÖÜÆÚ
+SecOCMainFunctionPeriodRx; //æ¥æ”¶å‘¨æœŸ
+SecOCMainFunctionPeriodTx;  //å‘é€å‘¨æœŸ
 
 
 
-
-void SecOC_Init (const SecOC_ConfigType* config);
+// ******************FUNCTION***********************
+//void SecOC_Init (const SecOC_ConfigType* config);
+FUNC(void, SECOC_CODE)
+secOc_Init(P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA) config);
 /*
-0x01 Í¬²½ ·ÇÖØÈë
-³õÊ¼»¯SECOCÄ£¿é¡£³É¹¦³õÊ¼»¯»áµ¼ÖÂ×´Ì¬SEC OC_INIT¡£
+0x01 åŒæ­¥ éé‡å…¥
+åˆå§‹åŒ–SECOCæ¨¡å—ã€‚æˆåŠŸåˆå§‹åŒ–ä¼šå¯¼è‡´çŠ¶æ€SEC OC_INITã€‚
 */
 
-void SecOC_DeInit (void);   //0x05 Í¬²½ ²»¿ÉÖØÈë
-//¸Ã·şÎñ½«Í£Ö¹°²È«³µÔØÍ¨ĞÅ¡£ËùÓĞ»º³åµÄI-PDU¶¼±»É¾³ı£¬Èç¹ûĞèÒª£¬
-//±ØĞëÔÚµ÷ÓÃSecOC_InitÖ®ºóÔÙ´Î»ñµÃ¡£Í¨¹ıµ÷ÓÃSecOC_DeInit£¬
-//½«AUTOSAR SecOCÄ£¿éÖÃÓÚÎ´³õÊ¼»¯×´Ì¬(SecOC_UNINIT)¡£
-//µ÷ÓÃ´Ëº¯Êıºó½«Çå¿ÕËùÓĞinternal global variables ºÍ i-pdu»º´æ
+// ******************FUNCTION***********************
+// void SecOC_DeInit (void);   //0x05 åŒæ­¥ ä¸å¯é‡å…¥
+FUNC(void, SECOC_CODE) 
+SecOC_DeInit(void);
+//è¯¥æœåŠ¡å°†åœæ­¢å®‰å…¨è½¦è½½é€šä¿¡ã€‚æ‰€æœ‰ç¼“å†²çš„I-PDUéƒ½è¢«åˆ é™¤ï¼Œå¦‚æœéœ€è¦ï¼Œ
+//å¿…é¡»åœ¨è°ƒç”¨SecOC_Initä¹‹åå†æ¬¡è·å¾—ã€‚é€šè¿‡è°ƒç”¨SecOC_DeInitï¼Œ
+//å°†AUTOSAR SecOCæ¨¡å—ç½®äºæœªåˆå§‹åŒ–çŠ¶æ€(SecOC_UNINIT)ã€‚
+//è°ƒç”¨æ­¤å‡½æ•°åå°†æ¸…ç©ºæ‰€æœ‰internal global variables å’Œ i-pduç¼“å­˜
+
+// ******************FUNCTION***********************
+// void SecOC_GetVersionInfo (Std_VersionInfoType* versioninfo);//0x02 åŒæ­¥ å¯é‡å…¥
+FUNC(void, SECOC_CODE)
+SecOC_GetVersionInfo(P2VAR(Std_VersionInfoType, AUTOMATIC, SECOC_APPL_DATA) versioninfo);
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_IfTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_IfTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr);
+//0x49 åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚ å‚è€ƒ7.4
+//E_OK: ä¼ è¾“è¯·æ±‚å·²è¢«æ¥å—ã€‚
+//E_NOT_OK: ä¼ è¾“è¯·æ±‚æœªè¢«æ¥å—
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_TpTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR) SECOC_CODE)
+SecOC_TpTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr);
+//0x49 åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚ å‚è€ƒ7.4
+//E_OK: ä¼ è¾“è¯·æ±‚å·²è¢«æ¥å—ã€‚
+//E_NOT_OK: ä¼ è¾“è¯·æ±‚æœªè¢«æ¥å—
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_IfCancelTransmit (PduIdType TxPduId );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_IfCancelTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId);
+//0x4a åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚
+//E_OK:ç›®æ ‡æ¨¡å—æˆåŠŸæ‰§è¡Œå–æ¶ˆã€‚
+//E_NOT_OK: ç›®æ ‡æ¨¡å—æ‹’ç»å–æ¶ˆã€‚
+//è¯·æ±‚å–æ¶ˆè¾ƒä½å±‚é€šä¿¡æ¨¡å—ä¸­æ­£åœ¨è¿›è¡Œçš„PDUä¼ è¾“ã€‚
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_TpCancelTransmit ( PduIdType TxPduId );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_TpCancelTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId);
+//0x4a åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚
+//E_OK:ç›®æ ‡æ¨¡å—æˆåŠŸæ‰§è¡Œå–æ¶ˆã€‚
+//E_NOT_OK: ç›®æ ‡æ¨¡å—æ‹’ç»å–æ¶ˆã€‚
+//è¯·æ±‚å–æ¶ˆè¾ƒä½å±‚é€šä¿¡æ¨¡å—ä¸­æ­£åœ¨è¿›è¡Œçš„PDUä¼ è¾“ã€‚
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_TpCancelReceive ( PduIdType RxPduId );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_TpCancelReceive(VAR(PduIdType, COMSTACK_TYPES_VAR) RxPduId);
+//0x4c åŒæ­¥ ä¸å¯é‡å…¥
+//E_OK:ç›®æ ‡æ¨¡å—æˆåŠŸæ‰§è¡Œå–æ¶ˆã€‚
+//E_NOT_OK: ç›®æ ‡æ¨¡å—æ‹’ç»å–æ¶ˆã€‚
+//è¯·æ±‚å–æ¶ˆè¾ƒä½å±‚ä¼ è¾“åè®®æ¨¡å—ä¸­æ­£åœ¨è¿›è¡Œçš„PDUæ¥æ”¶ã€‚
 
 
-void SecOC_GetVersionInfo (Std_VersionInfoType* versioninfo);//0x02 Í¬²½ ¿ÉÖØÈë
 
 
-Std_ReturnType SecOC_IfTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
-//0x49 Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£ ²Î¿¼7.4
-//E_OK: ´«ÊäÇëÇóÒÑ±»½ÓÊÜ¡£
-//E_NOT_OK: ´«ÊäÇëÇóÎ´±»½ÓÊÜ
 
 
-Std_ReturnType SecOC_TpTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
-//0x49 Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£ ²Î¿¼7.4
-//E_OK: ´«ÊäÇëÇóÒÑ±»½ÓÊÜ¡£
-//E_NOT_OK: ´«ÊäÇëÇóÎ´±»½ÓÊÜ
-
-Std_ReturnType SecOC_IfCancelTransmit (PduIdType TxPduId );
-//0x4a Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£
-//E_OK:Ä¿±êÄ£¿é³É¹¦Ö´ĞĞÈ¡Ïû¡£
-//E_NOT_OK: Ä¿±êÄ£¿é¾Ü¾øÈ¡Ïû¡£
-//ÇëÇóÈ¡Ïû½ÏµÍ²ãÍ¨ĞÅÄ£¿éÖĞÕıÔÚ½øĞĞµÄPDU´«Êä¡£
-
-Std_ReturnType SecOC_TpCancelTransmit ( PduIdType TxPduId );
-//0x4a Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£
-//E_OK:Ä¿±êÄ£¿é³É¹¦Ö´ĞĞÈ¡Ïû¡£
-//E_NOT_OK: Ä¿±êÄ£¿é¾Ü¾øÈ¡Ïû¡£
-//ÇëÇóÈ¡Ïû½ÏµÍ²ãÍ¨ĞÅÄ£¿éÖĞÕıÔÚ½øĞĞµÄPDU´«Êä¡£
-
-Std_ReturnType SecOC_TpCancelReceive ( PduIdType RxPduId );
-//0x4c Í¬²½ ²»¿ÉÖØÈë
-//E_OK:Ä¿±êÄ£¿é³É¹¦Ö´ĞĞÈ¡Ïû¡£
-//E_NOT_OK: Ä¿±êÄ£¿é¾Ü¾øÈ¡Ïû¡£
-//ÇëÇóÈ¡Ïû½ÏµÍ²ã´«ÊäĞ­ÒéÄ£¿éÖĞÕıÔÚ½øĞĞµÄPDU½ÓÊÕ¡£
 
 
 //Optional Interface
-Std_ReturnType SecOC_VerifyStatusOverride ( 
+
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_VerifyStatusOverride (
+// 	uint16 ValueID,
+// 	SecOC_OverrideStatusType overrideStatus,
+// 	uint8 numberOfMessagesToOverride
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_VerifyStatusOverride(
 	uint16 ValueID,
-	SecOC_OverrideStatusType overrideStatus,
-	uint8 numberOfMessagesToOverride 
+	VAR(SecOC_OverrideStatusType, RTE_SECOC_TYPES_VAR) overrideStatus,
+	uint8 numberOfMessagesToOverride
 );
-//0x0b Í¬²½ ¿ÉÖØÈë²»Í¬µÄFreshnessValueID¡£²»¿ÉÖØÈëÏàÍ¬µÄFreshnessValueID¡£
-//E_OK:ÇëÇó³É¹¦¡£
-//E_NOT_OK: ÇëÇóÊ§°Ü¡£
+//0x0b åŒæ­¥ å¯é‡å…¥ä¸åŒçš„FreshnessValueIDã€‚ä¸å¯é‡å…¥ç›¸åŒçš„FreshnessValueIDã€‚
+//E_OK:è¯·æ±‚æˆåŠŸã€‚
+//E_NOT_OK: è¯·æ±‚å¤±è´¥ã€‚
 //8.3.9
 
-Std_ReturnType SecOC_SendDefaultAuthenticationInformation ( 
-	uint16 FreshnessValueID, 
-	boolean sendDefaultAuthenticationInformation 
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_SendDefaultAuthenticationInformation (
+// 	uint16 FreshnessValueID,
+// 	boolean sendDefaultAuthenticationInformation
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_SendDefaultAuthenticationInformation(
+	uint16 FreshnessValueID,
+	boolean sendDefaultAuthenticationInformation
 );
-//0x04 Í¬²½ ¿ÉÖØÈë²»Í¬µÄFreshnessValueID¡£²»¿ÉÖØÈëÏàÍ¬µÄFreshnessValueID¡£
-//E_OK:ÇëÇó³É¹¦¡£
-//E_NOT_OK: ÇëÇóÊ§°Ü¡£
+//0x04 åŒæ­¥ å¯é‡å…¥ä¸åŒçš„FreshnessValueIDã€‚ä¸å¯é‡å…¥ç›¸åŒçš„FreshnessValueIDã€‚
+//E_OK:è¯·æ±‚æˆåŠŸã€‚
+//E_NOT_OK: è¯·æ±‚å¤±è´¥ã€‚
 //8.3.9
 
-
-
-//»Øµ÷Í¨Öª
-void SecOC_RxIndication ( 
-	PduIdType RxPduId, 
-	const PduInfoType* PduInfoPtr 
+// ******************FUNCTION***********************
+//å›è°ƒé€šçŸ¥
+// void SecOC_RxIndication (
+// 	PduIdType RxPduId,
+// 	const PduInfoType* PduInfoPtr
+// );
+FUNC(void, SECOC_CODE)
+SecOC_RxIndication(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) RxPduId,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr
 );
-//0x42 Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£
-//´Óµ×²ãÍ¨ĞÅ½Ó¿ÚÄ£¿éÊÕµ½µÄPDUÖ¸Ê¾
+//0x42 åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚
+//ä»åº•å±‚é€šä¿¡æ¥å£æ¨¡å—æ”¶åˆ°çš„PDUæŒ‡ç¤º
 
-void SecOC_TpRxIndication ( 
-	PduIdType id, 
-	Std_ReturnType result 
+// ******************FUNCTION***********************
+// void SecOC_TpRxIndication (
+// 	PduIdType id,
+// 	Std_ReturnType result
+// );
+FUNC(void, SECOC_CODE)
+SecOC_TpRxIndication(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
+	VAR(Std_ReturnType, STD_TYPES_VAR) result
 );
-//0x45 Í¬²½ ¿ÉÖØÈë
-//Í¨¹ıTP API½ÓÊÕµ½I-PDUÖ®ºóµ÷ÓÃ¸Ã·şÎñ£¬Æä½á¹û±íÊ¾´«ÊäÊÇ·ñ³É¹¦¡£
+//0x45 åŒæ­¥ å¯é‡å…¥
+//é€šè¿‡TP APIæ¥æ”¶åˆ°I-PDUä¹‹åè°ƒç”¨è¯¥æœåŠ¡ï¼Œå…¶ç»“æœè¡¨ç¤ºä¼ è¾“æ˜¯å¦æˆåŠŸã€‚
 
-void SecOC_TxConfirmation (PduIdType TxPduId, Std_ReturnType result);
-//0x40 Í¬²½ ¿ÉÖØÈë²»Í¬µÄPduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£
-//ÏÂ²ãÍ¨ĞÅ½Ó¿ÚÄ£¿éÈ·ÈÏPDUµÄ´«Êä»ò´«ÊäPDUÊ§°Ü¡£
+// ******************FUNCTION***********************
+// void SecOC_TxConfirmation (PduIdType TxPduId, Std_ReturnType result);
+FUNC(void, SECOC_CODE)
+SecOC_TxConfirmation(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, VAR(Std_ReturnType, STD_TYPES_VAR) result);
+//0x40 åŒæ­¥ å¯é‡å…¥ä¸åŒçš„PduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚
+//ä¸‹å±‚é€šä¿¡æ¥å£æ¨¡å—ç¡®è®¤PDUçš„ä¼ è¾“æˆ–ä¼ è¾“PDUå¤±è´¥ã€‚
 
-void SecOC_TpTxConfirmation ( 
-	PduIdType id, 
-	Std_ReturnType result 
+// ******************FUNCTION***********************
+// void SecOC_TpTxConfirmation (
+// 	PduIdType id,
+// 	Std_ReturnType result
+// );
+FUNC(void, SECOC_CODE)
+SecOC_TpTxConfirmation(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
+	VAR(Std_ReturnType, STD_TYPES_VAR) result
 );
-//0x48 Í¬²½ ¿ÉÖØÈë
-//I-PDUÔÚÆäÍøÂçÉÏ´«ÊäÖ®ºóµ÷ÓÃ¸Ãº¯Êı£¬Æä½á¹û±íÃ÷´«ÊäÊÇ·ñ³É¹¦¡£
+//0x48 åŒæ­¥ å¯é‡å…¥
+//I-PDUåœ¨å…¶ç½‘ç»œä¸Šä¼ è¾“ä¹‹åè°ƒç”¨è¯¥å‡½æ•°ï¼Œå…¶ç»“æœè¡¨æ˜ä¼ è¾“æ˜¯å¦æˆåŠŸã€‚
 
-Std_ReturnType SecOC_TriggerTransmit ( 
-	PduIdType TxPduId, 
-	PduInfoType* PduInfoPtr 
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_TriggerTransmit (
+// 	PduIdType TxPduId,
+// 	PduInfoType* PduInfoPtr
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_TriggerTransmit(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
+	P2VAR(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr
 );
-//0x41 Í¬²½ ¿ÉÖØÈë²»Í¬PduId¡£²»¿ÉÖØÈëÏàÍ¬µÄPduId¡£
-//ÔÚÕâ¸öAPIÖĞ£¬ÉÏ²ãÄ£¿é(±»µ÷ÓÃÄ£¿é)Ó¦¸Ã¼ì²é¿ÉÓÃÊı¾İÊÇ·ñ·ûºÏPduInfoPtr->SduLengthÉÏ±¨µÄ»º³åÇø´óĞ¡¡£
-//Èç¹û·ûºÏ£¬Ôò½«ÆäÊı¾İ¸´ÖÆµ½PduInfoPtr->SduDataPtrÌá¹©µÄ»º³åÇøÖĞ£¬²¢ÔÚPduInfoPtr->SduLengthÖĞ¸üĞÂÊµ¼Ê¸´ÖÆµÄÊı¾İ³¤¶È¡£
-//Èç¹û²»·ûºÏ£¬Ëü·µ»ØE_NOT_OK£¬²»¸Ä±äPduInfoPtr¡£
+//0x41 åŒæ­¥ å¯é‡å…¥ä¸åŒPduIdã€‚ä¸å¯é‡å…¥ç›¸åŒçš„PduIdã€‚
+//åœ¨è¿™ä¸ªAPIä¸­ï¼Œä¸Šå±‚æ¨¡å—(è¢«è°ƒç”¨æ¨¡å—)åº”è¯¥æ£€æŸ¥å¯ç”¨æ•°æ®æ˜¯å¦ç¬¦åˆPduInfoPtr->SduLengthä¸ŠæŠ¥çš„ç¼“å†²åŒºå¤§å°ã€‚
+//å¦‚æœç¬¦åˆï¼Œåˆ™å°†å…¶æ•°æ®å¤åˆ¶åˆ°PduInfoPtr->SduDataPtræä¾›çš„ç¼“å†²åŒºä¸­ï¼Œå¹¶åœ¨PduInfoPtr->SduLengthä¸­æ›´æ–°å®é™…å¤åˆ¶çš„æ•°æ®é•¿åº¦ã€‚
+//å¦‚æœä¸ç¬¦åˆï¼Œå®ƒè¿”å›E_NOT_OKï¼Œä¸æ”¹å˜PduInfoPtrã€‚
 
-BufReq_ReturnType SecOC_CopyRxData ( 
-	PduIdType id, 
-	const PduInfoType* info, 
-	PduLengthType* bufferSizePtr   //Êä³ö
+// ******************FUNCTION***********************
+// BufReq_ReturnType SecOC_CopyRxData (
+// 	PduIdType id,
+// 	const PduInfoType* info,
+// 	PduLengthType* bufferSizePtr   //è¾“å‡º
+// );
+FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
+SecOC_CopyRxData(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) info,
+	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA) bufferSizePtr //è¾“å‡º
 );
-//0x44 Í¬²½ ¿ÉÖØÈë
-//BUFREQ_OK£ºÊı¾İ¸´ÖÆ³É¹¦¡£
-//BUFREQ_E_NOT_OK£ºÓÉÓÚ·¢Éú´íÎó£¬Êı¾İÎ´±»¸´ÖÆ¡£
+//0x44 åŒæ­¥ å¯é‡å…¥
+//BUFREQ_OKï¼šæ•°æ®å¤åˆ¶æˆåŠŸã€‚
+//BUFREQ_E_NOT_OKï¼šç”±äºå‘ç”Ÿé”™è¯¯ï¼Œæ•°æ®æœªè¢«å¤åˆ¶ã€‚
 
-BufReq_ReturnType SecOC_CopyTxData ( 
-	PduIdType id, 
-	const PduInfoType* info, 
-	const RetryInfoType* retry, 
-	PduLengthType* availableDataPtr  //Êä³ö
+// ******************FUNCTION***********************
+// BufReq_ReturnType SecOC_CopyTxData (
+// 	PduIdType id,
+// 	const PduInfoType* info,
+// 	const RetryInfoType* retry,
+// 	PduLengthType* availableDataPtr  //è¾“å‡º
+// );
+FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
+SecOC_CopyTxData(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) info,
+	P2CONST(RetryInfoType, AUTOMATIC, SECOC_APPL_DATA) retry,
+	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA) availableDataPtr //è¾“å‡º
 );
-//0x43 Í¬²½ ¿ÉÖØÈë
-//BUFREQ_OK£ºÊı¾İÒÑÍêÈ«°´ÒªÇó¸´ÖÆµ½´«Êä»º³åÇø¡£
-//BUFREQ_E_BUSY£ºÇëÇó²»ÄÜ±»Âú×ã£¬ÒòÎªËùĞèµÄTxÊı¾İÁ¿²»¿ÉÓÃ¡£ÏÂ²ãÄ£¿é¿ÉÄÜÉÔºóÖØÊÔ´Ëµ÷ÓÃ¡£Ã»ÓĞ¸´ÖÆÈÎºÎÊı¾İ¡£
-//BUFREQ_E_NOT_OK£ºÊı¾İÎ´±»¸´ÖÆ¡£ÇëÇóÊ§°Ü¡£
-//µ÷ÓÃ±¾º¯ÊıÀ´»ñÈ¡I-PDU¶Î(N-PDU)µÄ´«ÊäÊı¾İ¡£³ı·Çretry->Tp DataStateÎªTp_DATARETRY£¬
-//·ñÔòÃ¿´Îµ÷ÓÃ±¾º¯Êı¶¼»áÌá¹©I-PDUÊı¾İµÄÏÂÒ»²¿·Ö¡£ÔÚ±¾ÀıÖĞ£¬±¾º¯ÊıÖØĞÂÆô¶¯À´¸´ÖÆÊı¾İ£¬
-//»á´Óretry->TxTpDataCntËùÖ¸Ê¾µÄµ±Ç°Î»ÖÃµÄÆ«ÒÆÁ¿¿ªÊ¼¸´ÖÆ¡£
-//Ê£ÓàÊı¾İµÄ´óĞ¡±»Ğ´Èëµ½availableDataPtrËùÖ¸Ê¾µÄÎ»ÖÃÖĞÈ¥¡£
+//0x43 åŒæ­¥ å¯é‡å…¥
+//BUFREQ_OKï¼šæ•°æ®å·²å®Œå…¨æŒ‰è¦æ±‚å¤åˆ¶åˆ°ä¼ è¾“ç¼“å†²åŒºã€‚
+//BUFREQ_E_BUSYï¼šè¯·æ±‚ä¸èƒ½è¢«æ»¡è¶³ï¼Œå› ä¸ºæ‰€éœ€çš„Txæ•°æ®é‡ä¸å¯ç”¨ã€‚ä¸‹å±‚æ¨¡å—å¯èƒ½ç¨åé‡è¯•æ­¤è°ƒç”¨ã€‚æ²¡æœ‰å¤åˆ¶ä»»ä½•æ•°æ®ã€‚
+//BUFREQ_E_NOT_OKï¼šæ•°æ®æœªè¢«å¤åˆ¶ã€‚è¯·æ±‚å¤±è´¥ã€‚
+//è°ƒç”¨æœ¬å‡½æ•°æ¥è·å–I-PDUæ®µ(N-PDU)çš„ä¼ è¾“æ•°æ®ã€‚é™¤éretry->Tp DataStateä¸ºTp_DATARETRYï¼Œ
+//å¦åˆ™æ¯æ¬¡è°ƒç”¨æœ¬å‡½æ•°éƒ½ä¼šæä¾›I-PDUæ•°æ®çš„ä¸‹ä¸€éƒ¨åˆ†ã€‚åœ¨æœ¬ä¾‹ä¸­ï¼Œæœ¬å‡½æ•°é‡æ–°å¯åŠ¨æ¥å¤åˆ¶æ•°æ®ï¼Œ
+//ä¼šä»retry->TxTpDataCntæ‰€æŒ‡ç¤ºçš„å½“å‰ä½ç½®çš„åç§»é‡å¼€å§‹å¤åˆ¶ã€‚
+//å‰©ä½™æ•°æ®çš„å¤§å°è¢«å†™å…¥åˆ°availableDataPtræ‰€æŒ‡ç¤ºçš„ä½ç½®ä¸­å»ã€‚
 
-BufReq_ReturnType SecOC_StartOfReception ( 
-	PduIdType id, 
-	const PduInfoType* info, 
-	PduLengthType TpSduLength, 
-	PduLengthType* bufferSizePtr 
+// ******************FUNCTION***********************
+// BufReq_ReturnType SecOC_StartOfReception (
+// 	PduIdType id,
+// 	const PduInfoType* info,
+// 	PduLengthType TpSduLength,
+// 	PduLengthType* bufferSizePtr
+// );
+FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
+SecOC_StartOfReception(
+	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA)info,
+	VAR(PduLengthType, COMSTACK_TYPES_VAR) TpSduLength,
+	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA)bufferSizePtr
 );
-//0x46 Í¬²½ ¿ÉÖØÈë
-//BUFREQ_OK£ºÁ¬½ÓÒÑ±»½ÓÊÜ¡£bufferSizePtr±íÊ¾¿ÉÓÃµÄ½ÓÊÕ»º³åÇø£»½ÓÊÕ¼ÌĞø¡£Èç¹ûÃ»ÓĞ¿ÉÓÃµÄËùĞè´óĞ¡µÄ»º³åÇø£¬ÔòbufferSizePtr½«±íÊ¾½ÓÊÕ»º³åÇø´óĞ¡Îª0¡£
-//BUFREQ_E_NOT_OK£ºÁ¬½Ó±»¾Ü¾ø£»½ÓÊÕ½«»áÖĞÖ¹¡£bufferSizePtr±£³Ö²»±ä¡£
-//BUFREQ_E_OVFL£ºÎŞ·¨Ìá¹©ËùĞè³¤¶ÈµÄ»º³åÇø£»½ÓÊÜ½«»áÖĞÖ¹¡£bufferSizePtr±£³Ö²»±ä¡£
-//±¾º¯ÊıÔÚ½ÓÊÕN-SDU¿ªÊ¼Ê±±»µ÷ÓÃ¡£N-SDU¿ÉÄÜ±»·Ö¸î³É¶à¸öN-PDU(´øÓĞÒ»¸ö»ò¶à¸öºóĞøCFµÄFF)£¬
-//»òÕß¿ÉÄÜÓÉµ¥¸öN-PDU (SF)×é³É¡£µ±TpSduLengthÎª0Ê±£¬¸Ã·şÎñ½«Ìá¹©µ±Ç°¿ÉÓÃµÄ×î´ó»º³åÇø´óĞ¡¡£
-//Èç¹ûµ÷ÓÃSecOC_StartOfReceptionÊ±TpSduLengthequalÎª0£¬ÔòSecOCÄ£¿é½«·µ»ØBUFREQ_E_NOT_OK£¬²¢²»²ÉÈ¡½øÒ»²½µÄĞĞ¶¯¡£
+//0x46 åŒæ­¥ å¯é‡å…¥
+//BUFREQ_OKï¼šè¿æ¥å·²è¢«æ¥å—ã€‚bufferSizePtrè¡¨ç¤ºå¯ç”¨çš„æ¥æ”¶ç¼“å†²åŒºï¼›æ¥æ”¶ç»§ç»­ã€‚å¦‚æœæ²¡æœ‰å¯ç”¨çš„æ‰€éœ€å¤§å°çš„ç¼“å†²åŒºï¼Œåˆ™bufferSizePtrå°†è¡¨ç¤ºæ¥æ”¶ç¼“å†²åŒºå¤§å°ä¸º0ã€‚
+//BUFREQ_E_NOT_OKï¼šè¿æ¥è¢«æ‹’ç»ï¼›æ¥æ”¶å°†ä¼šä¸­æ­¢ã€‚bufferSizePträ¿æŒä¸å˜ã€‚
+//BUFREQ_E_OVFLï¼šæ— æ³•æä¾›æ‰€éœ€é•¿åº¦çš„ç¼“å†²åŒºï¼›æ¥å—å°†ä¼šä¸­æ­¢ã€‚bufferSizePträ¿æŒä¸å˜ã€‚
+//æœ¬å‡½æ•°åœ¨æ¥æ”¶N-SDUå¼€å§‹æ—¶è¢«è°ƒç”¨ã€‚N-SDUå¯èƒ½è¢«åˆ†å‰²æˆå¤šä¸ªN-PDU(å¸¦æœ‰ä¸€ä¸ªæˆ–å¤šä¸ªåç»­CFçš„FF)ï¼Œ
+//æˆ–è€…å¯èƒ½ç”±å•ä¸ªN-PDU (SF)ç»„æˆã€‚å½“TpSduLengthä¸º0æ—¶ï¼Œè¯¥æœåŠ¡å°†æä¾›å½“å‰å¯ç”¨çš„æœ€å¤§ç¼“å†²åŒºå¤§å°ã€‚
+//å¦‚æœè°ƒç”¨SecOC_StartOfReceptionæ—¶TpSduLengthequalä¸º0ï¼Œåˆ™SecOCæ¨¡å—å°†è¿”å›BUFREQ_E_NOT_OKï¼Œå¹¶ä¸é‡‡å–è¿›ä¸€æ­¥çš„è¡ŒåŠ¨ã€‚
 
-
-//µ÷³ö¶¨Òå
-//µ÷³öÊÇÔÚECU¼¯³ÉÆÚ¼ä±ØĞëÌí¼Óµ½SecOCµÄ´úÂëÆ¬¶Î¡£´ó¶àÊıµ÷³öµÄÄÚÈİÊÇÊÖĞ´µÄ´úÂë
-Std_ReturnType SecOC_GetRxFreshness ( 
-	uint16 SecOCFreshnessValueID, 
-	const uint8* SecOCTruncatedFreshnessValue, 
-	uint32 SecOCTruncatedFreshnessValueLength, 
-	uint16 SecOCAuthVerifyAttempts, 
-	uint8* SecOCFreshnessValue,    //Êä³ö
-	uint32* SecOCFreshnessValueLength    //Èë³ö
+// ******************FUNCTION***********************
+//è°ƒå‡ºå®šä¹‰
+//è°ƒå‡ºæ˜¯åœ¨ECUé›†æˆæœŸé—´å¿…é¡»æ·»åŠ åˆ°SecOCçš„ä»£ç ç‰‡æ®µã€‚å¤§å¤šæ•°è°ƒå‡ºçš„å†…å®¹æ˜¯æ‰‹å†™çš„ä»£ç 
+// Std_ReturnType SecOC_GetRxFreshness (
+// 	uint16 SecOCFreshnessValueID,
+// 	const uint8* SecOCTruncatedFreshnessValue,
+// 	uint32 SecOCTruncatedFreshnessValueLength,
+// 	uint16 SecOCAuthVerifyAttempts,
+// 	uint8* SecOCFreshnessValue,    //è¾“å‡º
+// 	uint32* SecOCFreshnessValueLength    //å…¥å‡º
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_GetRxFreshness(
+	uint16 SecOCFreshnessValueID,
+	const uint8 *SecOCTruncatedFreshnessValue,
+	uint32 SecOCTruncatedFreshnessValueLength,
+	uint16 SecOCAuthVerifyAttempts,
+	uint8 *SecOCFreshnessValue,		  //è¾“å‡º
+	uint32 *SecOCFreshnessValueLength //å…¥å‡º
 );
-//0x4f Í¬²½ ¿ÉÖØÈë
-//E_OK£ºÇëÇó³É¹¦
-//E_NOT_OK£ºÇëÇóÊ§°Ü£¬ÓÉÓÚĞÂÏÊ¶È»òÕâ¸öFreshnessValueIdµÄÆÕ±éÎÊÌâ£¬ÎŞ·¨Ìá¹©ĞÂÏÊ¶ÈÖµ¡£
-//E_BUSY£ºĞÂÏÊ¶ÈĞÅÏ¢ÔİÊ±ÎŞ·¨Ìá¹©¡£
-//SecOCÊ¹ÓÃ¸Ã½Ó¿ÚÀ´»ñÈ¡µ±Ç°µÄĞÂÏÊ¶ÈÖµ¡£
+//0x4f åŒæ­¥ å¯é‡å…¥
+//E_OKï¼šè¯·æ±‚æˆåŠŸ
+//E_NOT_OKï¼šè¯·æ±‚å¤±è´¥ï¼Œç”±äºæ–°é²œåº¦æˆ–è¿™ä¸ªFreshnessValueIdçš„æ™®éé—®é¢˜ï¼Œæ— æ³•æä¾›æ–°é²œåº¦å€¼ã€‚
+//E_BUSYï¼šæ–°é²œåº¦ä¿¡æ¯æš‚æ—¶æ— æ³•æä¾›ã€‚
+//SecOCä½¿ç”¨è¯¥æ¥å£æ¥è·å–å½“å‰çš„æ–°é²œåº¦å€¼ã€‚
 
-Std_ReturnType SecOC_GetRxFreshnessAuthData ( 
-	uint16 SecOCFreshnessValueID, 
-	const uint8* SecOCTruncatedFreshnessValue, 
-	uint32 SecOCTruncatedFreshnessValueLength, 
-	const uint8* SecOCAuthDataFreshnessValue,     //¸Ã²ÎÊı±£´æÁË½ÓÊÕµ½µÄÉĞÎ´¾­¹ıÉí·İÑéÖ¤µÄPDUµÄÒ»²¿·Ö¡£¸Ã²ÎÊıÊÇ¿ÉÑ¡µÄ(²Î¼ûÃèÊö)¡£
-	uint16 SecOCAuthDataFreshnessValueLength,    //ÒÔÎ»Îªµ¥Î»£¬±£´æauthentic PDUµÄĞÂÏÊ¶ÈµÄ³¤¶È¡£¸Ã²ÎÊıÊÇ¿ÉÑ¡µÄ(²Î¼ûÃèÊö)¡£
-	uint16 SecOCAuthVerifyAttempts, 
-	uint8* SecOCFreshnessValue,        //Êä³ö
-	uint32* SecOCFreshnessValueLength    //Èë³ö
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_GetRxFreshnessAuthData (
+// 	uint16 SecOCFreshnessValueID,
+// 	const uint8* SecOCTruncatedFreshnessValue,
+// 	uint32 SecOCTruncatedFreshnessValueLength,
+// 	const uint8* SecOCAuthDataFreshnessValue,     //è¯¥å‚æ•°ä¿å­˜äº†æ¥æ”¶åˆ°çš„å°šæœªç»è¿‡èº«ä»½éªŒè¯çš„PDUçš„ä¸€éƒ¨åˆ†ã€‚è¯¥å‚æ•°æ˜¯å¯é€‰çš„(å‚è§æè¿°)ã€‚
+// 	uint16 SecOCAuthDataFreshnessValueLength,    //ä»¥ä½ä¸ºå•ä½ï¼Œä¿å­˜authentic PDUçš„æ–°é²œåº¦çš„é•¿åº¦ã€‚è¯¥å‚æ•°æ˜¯å¯é€‰çš„(å‚è§æè¿°)ã€‚
+// 	uint16 SecOCAuthVerifyAttempts,
+// 	uint8* SecOCFreshnessValue,        //è¾“å‡º
+// 	uint32* SecOCFreshnessValueLength    //å…¥å‡º
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_GetRxFreshnessAuthData(
+	uint16 SecOCFreshnessValueID,
+	const uint8 *SecOCTruncatedFreshnessValue,
+	uint32 SecOCTruncatedFreshnessValueLength,
+	const uint8 *SecOCAuthDataFreshnessValue, //è¯¥å‚æ•°ä¿å­˜äº†æ¥æ”¶åˆ°çš„å°šæœªç»è¿‡èº«ä»½éªŒè¯çš„PDUçš„ä¸€éƒ¨åˆ†ã€‚è¯¥å‚æ•°æ˜¯å¯é€‰çš„(å‚è§æè¿°)ã€‚
+	uint16 SecOCAuthDataFreshnessValueLength, //ä»¥ä½ä¸ºå•ä½ï¼Œä¿å­˜authentic PDUçš„æ–°é²œåº¦çš„é•¿åº¦ã€‚è¯¥å‚æ•°æ˜¯å¯é€‰çš„(å‚è§æè¿°)ã€‚
+	uint16 SecOCAuthVerifyAttempts,
+	uint8 *SecOCFreshnessValue,		  //è¾“å‡º
+	uint32 *SecOCFreshnessValueLength //å…¥å‡º
 );
-//0x4e Í¬²½ ¿ÉÖØÈë
-//E_OK£ºÇëÇó³É¹¦
-//E_NOT_OK£ºÇëÇóÊ§°Ü£¬ÓÉÓÚĞÂÏÊ¶È»òÕâ¸öFreshnessValueIdµÄÆÕ±éÎÊÌâ£¬ÎŞ·¨Ìá¹©ĞÂÏÊ¶ÈÖµ¡£
-//E_BUSY£ºĞÂÏÊ¶ÈĞÅÏ¢ÔİÊ±ÎŞ·¨Ìá¹©¡£
-//SecOCÊ¹ÓÃ¸Ã½Ó¿ÚÀ´»ñÈ¡µ±Ç°µÄĞÂÏÊ¶ÈÖµ¡£
+//0x4e åŒæ­¥ å¯é‡å…¥
+//E_OKï¼šè¯·æ±‚æˆåŠŸ
+//E_NOT_OKï¼šè¯·æ±‚å¤±è´¥ï¼Œç”±äºæ–°é²œåº¦æˆ–è¿™ä¸ªFreshnessValueIdçš„æ™®éé—®é¢˜ï¼Œæ— æ³•æä¾›æ–°é²œåº¦å€¼ã€‚
+//E_BUSYï¼šæ–°é²œåº¦ä¿¡æ¯æš‚æ—¶æ— æ³•æä¾›ã€‚
+//SecOCä½¿ç”¨è¯¥æ¥å£æ¥è·å–å½“å‰çš„æ–°é²œåº¦å€¼ã€‚
 
-Std_ReturnType SecOC_GetTxFreshness ( 
-	uint16 SecOCFreshnessValueID, 
-	uint8* SecOCFreshnessValue,    //Êä³ö
-	uint32* SecOCFreshnessValueLength 
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_GetTxFreshness (
+// 	uint16 SecOCFreshnessValueID,
+// 	uint8* SecOCFreshnessValue,    //è¾“å‡º
+// 	uint32* SecOCFreshnessValueLength
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_GetTxFreshness(
+	uint16 SecOCFreshnessValueID,
+	uint8 *SecOCFreshnessValue, //è¾“å‡º
+	uint32 *SecOCFreshnessValueLength
 );
-//0x52 Í¬²½ ¿ÉÖØÈë
-//E_OK£ºÇëÇó³É¹¦
-//E_NOT_OK£ºÇëÇóÊ§°Ü£¬ÓÉÓÚĞÂÏÊ¶È»òÕâ¸öFreshnessValueIdµÄÆÕ±éÎÊÌâ£¬ÎŞ·¨Ìá¹©ĞÂÏÊ¶ÈÖµ¡£
-//E_BUSY£ºĞÂÏÊ¶ÈĞÅÏ¢ÔİÊ±ÎŞ·¨Ìá¹©¡£
-//Õâ¸öAPI´ÓÊı×é(SecOCFreshnessValue)µÚÒ»¸ö×Ö½ÚµÄ×îÓĞĞ§Î»ÒÔ´ó¶Ë×Ö½Ú¸ñÊ½·µ»ØĞÂÏÊ¶ÈÖµ¡£
+//0x52 åŒæ­¥ å¯é‡å…¥
+//E_OKï¼šè¯·æ±‚æˆåŠŸ
+//E_NOT_OKï¼šè¯·æ±‚å¤±è´¥ï¼Œç”±äºæ–°é²œåº¦æˆ–è¿™ä¸ªFreshnessValueIdçš„æ™®éé—®é¢˜ï¼Œæ— æ³•æä¾›æ–°é²œåº¦å€¼ã€‚
+//E_BUSYï¼šæ–°é²œåº¦ä¿¡æ¯æš‚æ—¶æ— æ³•æä¾›ã€‚
+//è¿™ä¸ªAPIä»æ•°ç»„(SecOCFreshnessValue)ç¬¬ä¸€ä¸ªå­—èŠ‚çš„æœ€æœ‰æ•ˆä½ä»¥å¤§ç«¯å­—èŠ‚æ ¼å¼è¿”å›æ–°é²œåº¦å€¼ã€‚
 
-Std_ReturnType SecOC_GetTxFreshnessTruncData ( 
-	uint16 SecOCFreshnessValueID, 
-	uint8* SecOCFreshnessValue, 
-	uint32* SecOCFreshnessValueLength, 
-	uint8* SecOCTruncatedFreshnessValue,  
-	uint32* SecOCTruncatedFreshnessValueLength 
+// ******************FUNCTION***********************
+// Std_ReturnType SecOC_GetTxFreshnessTruncData (
+// 	uint16 SecOCFreshnessValueID,
+// 	uint8* SecOCFreshnessValue,
+// 	uint32* SecOCFreshnessValueLength,
+// 	uint8* SecOCTruncatedFreshnessValue,
+// 	uint32* SecOCTruncatedFreshnessValueLength
+// );
+FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
+SecOC_GetTxFreshnessTruncData(
+	uint16 SecOCFreshnessValueID,
+	uint8 *SecOCFreshnessValue,
+	uint32 *SecOCFreshnessValueLength,
+	uint8 *SecOCTruncatedFreshnessValue,
+	uint32 *SecOCTruncatedFreshnessValueLength
 );
-//0x51 Í¬²½ ¿ÉÖØÈë
-//E_OK£ºÇëÇó³É¹¦
-//E_NOT_OK£ºÇëÇóÊ§°Ü£¬ÓÉÓÚĞÂÏÊ¶È»òÕâ¸öFreshnessValueIdµÄÆÕ±éÎÊÌâ£¬ÎŞ·¨Ìá¹©ĞÂÏÊ¶ÈÖµ¡£
-//E_BUSY£ºĞÂÏÊ¶ÈĞÅÏ¢ÔİÊ±ÎŞ·¨Ìá¹©¡£
-//SecOCÊ¹ÓÃÕâ¸ö½Ó¿ÚÀ´»ñÈ¡µ±Ç°µÄĞÂÏÊ¶ÈÖµ¡£½Ó¿Úº¯Êı»¹Ìá¹©ÁËÔÚSecured I-PDUÖĞ´«ÊäµÄ½Ø¶ÏĞÂÏÊ¶È¡£
+//0x51 åŒæ­¥ å¯é‡å…¥
+//E_OKï¼šè¯·æ±‚æˆåŠŸ
+//E_NOT_OKï¼šè¯·æ±‚å¤±è´¥ï¼Œç”±äºæ–°é²œåº¦æˆ–è¿™ä¸ªFreshnessValueIdçš„æ™®éé—®é¢˜ï¼Œæ— æ³•æä¾›æ–°é²œåº¦å€¼ã€‚
+//E_BUSYï¼šæ–°é²œåº¦ä¿¡æ¯æš‚æ—¶æ— æ³•æä¾›ã€‚
+//SecOCä½¿ç”¨è¿™ä¸ªæ¥å£æ¥è·å–å½“å‰çš„æ–°é²œåº¦å€¼ã€‚æ¥å£å‡½æ•°è¿˜æä¾›äº†åœ¨Secured I-PDUä¸­ä¼ è¾“çš„æˆªæ–­æ–°é²œåº¦ã€‚
 
-void SecOC_SPduTxConfirmation ( 
-	uint16 SecOCFreshnessValueID 
+// ******************FUNCTION***********************
+// void SecOC_SPduTxConfirmation (
+// 	uint16 SecOCFreshnessValueID
+// );
+FUNC(void, SECOC_CODE)
+SecOC_SPduTxConfirmation(
+	uint16 SecOCFreshnessValueID
 );
-//0x4d Í¬²½ ¿ÉÖØÈë
-//SecOCÀûÓÃ¸Ã½Ó¿ÚÈ¥±íÊ¾Secured I-PDUÒÑ¾­¿ªÊ¼½øĞĞ´«Êä¡£
+//0x4d åŒæ­¥ å¯é‡å…¥
+//SecOCåˆ©ç”¨è¯¥æ¥å£å»è¡¨ç¤ºSecured I-PDUå·²ç»å¼€å§‹è¿›è¡Œä¼ è¾“ã€‚
 
 
 
@@ -258,7 +389,7 @@ void SecOC_SPduTxConfirmation (
 
 
 //
-////8.8·şÎñ½Ó¿Ú
+////8.8æœåŠ¡æ¥å£
 ///*nterfaces
 //described here will be visible on the VFB and are used to generate the Rte between
 //application software and the SecOC module.
@@ -272,8 +403,8 @@ void SecOC_SPduTxConfirmation (
 //		uint8 numberOfMessagesToOverride
 //	]
 //);
-////E_OK ²Ù×÷³É¹¦
-////E_NOT_OK ²Ù×÷Ê§°Ü
+////E_OK æ“ä½œæˆåŠŸ
+////E_NOT_OK æ“ä½œå¤±è´¥
 //
 //FreshnessManagement(
 //
@@ -318,9 +449,9 @@ void SecOC_SPduTxConfirmation (
 //
 //
 //);
-////0	E_OK	²Ù×÷³É¹¦
-////1	E_NOT_OK	²Ù×÷Ê§°Ü
-////2	E_BUSY	²Ù×÷ÔİÊ±Ê§°Ü£¬ĞÂÏÊÖµµ±Ç°ÎŞ·¨Ìá¹©¡£
+////0	E_OK	æ“ä½œæˆåŠŸ
+////1	E_NOT_OK	æ“ä½œå¤±è´¥
+////2	E_BUSY	æ“ä½œæš‚æ—¶å¤±è´¥ï¼Œæ–°é²œå€¼å½“å‰æ— æ³•æä¾›ã€‚
 
 
 
