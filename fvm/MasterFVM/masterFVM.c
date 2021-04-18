@@ -16,7 +16,8 @@ uint8 trip[3];  //初始化时从非易失性存储器中获得并+1后再存回
 uint8 TripCntLength=16;    //可配置
 
 
-void MasterFVM_Init(void){
+FUNC(void, MASTER_CODE)
+MasterFVM_Init(void){
 /*
 	1.获取非易失性存储器中的值，存入全局变量trip[3]对应索引内，trip数组使用情况依据TripCntLength决定。优先使用低索引；
 	2.对trip[3]+1, 达到char最大值则，发生进位;  
@@ -54,7 +55,8 @@ void MasterFVM_Init(void){
 
 uint16 tripcanid=0x2bd;  //可配置
 
-void MasterFVM_getTripValue(const PduInfoType* PduInfoPtr ){
+FUNC(void, MASTER_CODE)
+MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr){
 	/*
 	默认使用数据长度为8的can通信，因此trip同步消息将由trip[],reset[],mac共同使用8字节，并将连接的结果存入pudInfoPtr中。
 		trip(TripCntLength)表示 这个数组实际长度由bit长度决定，在构造dataptr时需要修改各比特站位，将trip[]数组前面空位移除
@@ -71,7 +73,8 @@ void MasterFVM_getTripValue(const PduInfoType* PduInfoPtr ){
 	*/
 } 
 
-void MasterFVM_getResetValue(PduIdType TxPduId, const PduInfoType* PduInfoPtr){
+FUNC(void, MASTER_CODE)
+MasterFVM_getResetValue(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr){
 	/*
 	1.先判断TxPduId 若>=NUM_RESET， 则直接退出;
 	
@@ -97,7 +100,8 @@ void MasterFVM_getResetValue(PduIdType TxPduId, const PduInfoType* PduInfoPtr){
 
 
 
-void MasterFVM_changestate(PduIdType TxPduId){
+FUNC(void, MASTER_CODE)
+MasterFVM_changestate(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId){
 	/* 收到id后检查confirmECU 对应索引值， 修改state状态为1， 发送ackv的报文*/
 	ConfirmECU_Type tmp*;
 	tmp = &confirmECU[TxPduId];
@@ -124,7 +128,8 @@ uint16 notifycanid=0x386;  //可配置
 
 uint8 multi=1; //时间倍率  1表示一次调用MainTx 为1ms   可配置 
 
-void MasterFVM_MainTx(void){
+FUNC(void, MASTER_CODE)
+MasterFVM_MainTx(void){
 	/*
 		本函数将被时间调度函数周期性调用，执行内容如下：
 		1.若未曾发送过trip报文，则发送一次
