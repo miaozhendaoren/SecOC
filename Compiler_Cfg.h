@@ -64,8 +64,12 @@
 
 // ptrclass
 #define SECOC_APPL_DATA
+
 #define SLAVE_APPL_DATA
+#define SLAVE_APPL_CONST
+
 #define MASTER_APPL_DATA
+#define MASTER_APPL_CONST
 // memclass
 
 // AUTOMATIC
@@ -93,3 +97,4 @@
 #define STD_TYPES_VAR
 #define COMSTACK_TYPES_VAR
 #define RTE_SECOC_TYPES_VAR
+#define FRESH_VAR

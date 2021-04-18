@@ -1,6 +1,33 @@
 # SecOC
 
 
+## Slave模块
+`Std_ReturnType` :
+    `FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)`
+
+`PduIdType RxPduId` :
+    `VAR(PduInfoType,COMSTACK_TYPES_VAR) RxPduId`
+
+`const PduInfoType* PduInfoPtr` :
+    `P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr`
+
+`uint16 SecOCFreshnessValueID,`:
+    `VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,`
+
+`uint8* SecOCFreshnessValue,` :
+    `P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,`
+
+`uint32* SecOCFreshnessValueLength,`:
+    `P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength`
+
+`uint8* SecOCTruncatedFreshnessValue,` :
+    `P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCTruncatedFreshnessValue,`
+
+`uint32* SecOCTruncatedFreshnessValueLength` :
+    `P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCTruncatedFreshnessValueLength`   
+     
+`const uint8* SecOCTruncatedFreshnessValue,` :
+    ``
 
 ## SecOC 模块
 
