@@ -14,7 +14,8 @@ uint16 notifyid = 0x386;  // ecu返回的通知报文  可配置
 uint8 secocenabled=0;  //secoc可工作  0表示不行  1表示可以
 uint8 errorid=0x64;   
 
-void FVM_changestate(PduIdType RxPduId){
+FUNC(void,SLAVE_CODE)
+FVM_changestate(VAR(PduInfoType,COMSTACK_TYPES_VAR) RxPduId){
 	/*根据id匹配不同报文
 	1.ack确认报文表示 master收到自己的ack报文，修改标记在后续收到trip同步报文不返回ack报文
 	2.通知报文送达则secoc功能可执行。。
@@ -31,7 +32,8 @@ void FVM_changestate(PduIdType RxPduId){
 }
 
 
-void FVM_Syn_check(void){
+FUNC(void,SLAVE_CODE)
+FVM_Syn_check(void){
 	/*
 	1.判断secocenabled ==1 可用
 		周期性调用查看reset同步消息有没有丢失达到上限
@@ -74,7 +76,8 @@ uint8 TripCntLengthgth=16;  //可配置
 uint16 ackid=0x2be; //返回的ack报文  可配置
 
 
-Std_ReturnType FVM_updateTrip(const PduInfoType* PduInfoPtr ){
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
+FVM_updateTrip(P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr){
 	/*
 		1.若收到过ack确认报文证明自己的ack被Master接收，直接结束
 		2.解析收到的trip报文，重新构造验证mac所需的原始数据dataptr
@@ -99,7 +102,8 @@ Std_ReturnType FVM_updateTrip(const PduInfoType* PduInfoPtr ){
 
 uint16 error_id=0x100; //报错报文id   可配置
 
-Std_ReturnType FVM_updateReset(PduIdType TxPduId, const PduInfoType* PduInfoPtr){
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
+FVM_updateReset(VAR(PduIdType,COMSTACK_TYPES_VAR) TxPduId,P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr){
 	/*
 		1.先判断TxPduId 若>=NUM_RESET， 则直接退出;
 		2.解析收到的reset报文，重新构造验证mac所需的原始数据dataptr
@@ -115,10 +119,11 @@ Std_ReturnType FVM_updateReset(PduIdType TxPduId, const PduInfoType* PduInfoPtr)
 }
 
 //下面两个函数是sender slave的部分
-Std_ReturnType FVM_GetTxFreshness (
-	uint16 SecOCFreshnessValueID,
-	uint8* SecOCFreshnessValue,
-	uint32* SecOCFreshnessValueLength
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE) 
+FVM_GetTxFreshness(
+	VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength
 ){
 
 	/*
@@ -130,12 +135,11 @@ Std_ReturnType FVM_GetTxFreshness (
 }  //获得数据消息canid对应的fv
 
 //获取新鲜值及 裁剪新鲜值
-Std_ReturnType FvM_GetTxFreshnessTruncData (
-	uint16 SecOCFreshnessValueID,
-	uint8* SecOCFreshnessValue,
-	uint32* SecOCFreshnessValueLength,
-	uint8* SecOCTruncatedFreshnessValue,
-	uint32* SecOCTruncatedFreshnessValueLength
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE) 
+FVM_GetTxFreshness(
+	VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength
 ){
 /*
 	1.根据SecOCFreshnessValueID 作为索引找到需要对应的 resetCnt[id], preTrip, msgCnt[]
@@ -148,13 +152,13 @@ Std_ReturnType FvM_GetTxFreshnessTruncData (
 
 
 //下面两个函数是receiver slave的部分
-Std_ReturnType FVM_GetRxFreshness (
-	uint16 SecOCFreshnessValueID,
-    const uint8* SecOCTruncatedFreshnessValue,
-    uint32 SecOCTruncatedFreshnessValueLength,
-    uint16 SecOCAuthVerifyAttempts,
-    uint8* SecOCFreshnessValue,
-    uint32* SecOCFreshnessValueLength
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
+FVM_GetRxFreshness(
+	P2CONST(uint8,SLAVE_CODE,SLAVE_APPL_CONST) SecOCTruncatedFreshnessValue,
+	VAR(uint32,FRESH_VAR) SecOCTruncatedFreshnessValueLength,
+	VAR(uint16,FRESH_VAR) SecOCAuthVerifyAttempts,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength
 ){
 /*
 	1.若SecOCTruncatedFreshnessValueLength ==SecOCFreshnessValueLength   将SecOCTruncatedFreshnessValue 复制到 SecOCFreshnessValue
@@ -169,22 +173,24 @@ Std_ReturnType FVM_GetRxFreshness (
 */
 }
 
-Std_ReturnType FVM_GetRxFreshnessAuthData (
-	uint16 SecOCFreshnessValueID,
-	const uint8* SecOCTruncatedFreshnessValue,
-	uint32 SecOCTruncatedFreshnessValueLength,
-	const uint8* SecOCAuthDataFreshnessValue,
-	uint16 SecOCAuthDataFreshnessValueLength,
-	uint16 SecOCAuthVerifyAttempts,
-	uint8* SecOCFreshnessValue,
-	uint32* SecOCFreshnessValueLength
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
+FVM_GetRxFreshnessAuthData(
+	VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,
+	P2CONST(uint8,SLAVE_CODE,SLAVE_APPL_CONST) SecOCTruncatedFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCTruncatedFreshnessValueLength,
+	P2CONST(uint8,SLAVE_CODE,SLAVE_APPL_CONST) SecOCAuthDataFreshnessValue,
+	VAR(uint16,FRESH_VAR) SecOCAuthDataFreshnessValueLength,
+	VAR(uint16,FRESH_VAR) SecOCAuthVerifyAttempts,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength
 ){
 
 }
 
 
 //需保证报文没被取消
-void FVM_updatePreValue(uint16 SecOCFreshnessValueID,  uint8* SecOCFreshnessValue){
+FUNC(void,SLAVE_CODE)
+FVM_updatePreValue(VAR(PduIdType,COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr){
 	/*
 		根据完整SecOCFreshnessValue 更新
 
