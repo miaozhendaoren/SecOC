@@ -22,7 +22,8 @@
 #define TEST_PBCFG
 
 #define SECOC_CODE
-
+#define SLAVE_CODE
+#define MASTER_CODE
 
 /* Pointer定义 对应的 配置代码*/
 /*
@@ -63,8 +64,10 @@
 
 // ptrclass
 #define SECOC_APPL_DATA
-
+#define SLAVE_APPL_DATA
+#define MASTER_APPL_DATA
 // memclass
+
 // AUTOMATIC
 
 

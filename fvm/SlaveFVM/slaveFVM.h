@@ -1,15 +1,22 @@
 #ifndef _SLAVEFVM_H
 #define _SLAVEFVM_H
 #include "slaveFVM_Cfg.h"
+#include "../../Compiler.h"
+#include "../../Compiler_Cfg.h"
 
+// void FVM_changestate(PduIdType RxPduId);
+FUNC(void,SLAVE_CODE)
+FVM_changestate(VAR(PduInfoType,COMSTACK_TYPES_VAR));
 
-void FVM_changestate(PduIdType RxPduId);
+// void FVM_Syn_check(void);
+FUNC(void,SLAVE_CODE)
+FVM_Syn_check(void);
 
-void FVM_Syn_check(void);
+// Std_ReturnType FVM_updateTrip(const PduInfoType* PduInfoPtr );  //更新trip值
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR))
+FVM_updateTrip(P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_DATA) PduInfoPtr);
 
-Std_ReturnType FVM_updateTrip(const PduInfoType* PduInfoPtr );  //更新trip值
-
-Std_ReturnType FVM_updateReset(PduIdType TxPduId, const PduInfoType* PduInfoPtr);  //更新reset值
+// Std_ReturnType FVM_updateReset(PduIdType TxPduId, const PduInfoType* PduInfoPtr);  //更新reset值
 
 
 Std_ReturnType FVM_GetTxFreshness (
