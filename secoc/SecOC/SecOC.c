@@ -656,196 +656,432 @@ void SecOC_MainFunctionRx ( void )
 //}
 
 // ******************FUNCTION***********************
-void authenticate(SecOCintermidate_type SecOCintermidate,  PduInfoType* PduInfoPtr){
+// void authenticate(SecOCintermidate_type SecOCintermidate,  PduInfoType* PduInfoPtr) {
+
+// 	uint8 pduid = SecOCintermidate.SecOCTxPduId;
+// 	boolean judgePattern=0;
+// 	Std_ReturnType resultfv, resultmac;
+// 	uint8* SecOCFreshnessValue;
+// 	uint8* SecOCTruncatedFreshnessValue;
+// 	uint8* Mac;
+// 	uint8* truncatedMac;
+// 	uint8 *tmpinterpnt = tmpinter;
+// 	uint8 tmpinterlen=0;
+// 	memcpy(tmpinterpnt, SecOCintermidate.adatachar, SecOCintermidate.len);
+// 	tmpinterlen+=SecOCintermidate.len;
+// 	PduInfoPtr->SduLength=0;
+// 	if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
+// 		if(tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE){
+// 			resultfv = SecOC_GetTxFreshnessTruncData(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId,
+// 					SecOCFreshnessValue,
+// 					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength,
+// 					SecOCTruncatedFreshnessValue,
+// 					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength);
+// 			*(tmpinter+tmpinterlen) = SecOCTruncatedFreshnessValue;
+// 			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength;
+// 		}else{
+// 			resultfv = SecOC_GetTxFreshness(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId,
+// 					SecOCFreshnessValue,
+// 					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength);
+// 			*(tmpinter+tmpinterlen) = SecOCFreshnessValue;
+// 			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength;
+
+// 		}
+// 	}else{  //rte
+// 		if(tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE){
+// 			resultfv = FreshnessManagement_GetTxFreshnessTruncData();
+// 		}else{
+// 			resultfv = FreshnessManagement_GetTxFreshness();
+// 		}
+// 	}
+
+// 	if( resultfv ==E_OK){
+
+// 		resultmac = Csm_MacGenerate(SecOCTxPduProcessing[pduid].SecOCTxAuthServiceConfigRef,0,tmpinter, tmpinterlen,truncatedMac, tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength);
+// 		if(resultmac == E_OK){
+
+// 			*(tmpinter+tmpinterlen) = truncatedMac;
+// 			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength;
+// 			memcpy(SecOCintermidate.sdatachar, tmpinter, tmpinterlen);
+// 			SecOCintermidate.slen = tmpinterlen;
+// //			updatePreTxValue(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId, SecOCFreshnessValue);
+
+// 			if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
+// 				SecOC_SPduTxConfirmation(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueID);
+// 			}else{//RTE
+// 				FreshnessManagement_SPduTxConfirmation();
+// 			}
+// 			PduInfoPtr->SduDataPtr = SecOCintermidat.sdatachar;
+// 			PduInfoPtr->SduLength = SecOCintermidat.slen;
+// 		}else if(resultmac == E_NOT_OK || KEY_FAILURE){ //不可恢复错误
+// 			judgePattern=1;
+// 		}else{  //可恢复错误 abc+=1
+// 			SecOCintermidate.abc+=1;
+// 			if(SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts){
+// 				judgePattern=1;
+// 			}
+
+// 		}
+// 	}else if(resultfv ==E_BUSY){
+// 		SecOCintermidate.abc+=1;
+// 		if(SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts){
+// 			judgePattern=1;
+// 		}
+// 	}else{ // 不可恢复错误
+// 		judgePattern=1;
+// 	}
+
+
+// 	if(judgePattern==1){
+// 		if(tmpSecOCGeneral.SecOCDefaultAuthenticationInformationPattern>-1){
+// 			result =SecOC_SendDefaultAuthenticationInformation(curSecOCTxPduProcessing.SecOCFreshnessValueId, 1);
+// 		}else{
+// 			SecOCintermidate.len=0;
+// 		}
+// 		report_DET(SECOC_E_CRYPTO_FAILURE);
+// 	}
+
+
+
+// }
+
+FUNC(void, SECOC_CODE)
+authenticate(VAR(SecOCintermidate_type, SECOC_APPL_DATA) SecOCintermidate, P2VAR(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr)
+{
 
 	uint8 pduid = SecOCintermidate.SecOCTxPduId;
-	boolean judgePattern=0;
+	boolean judgePattern = 0;
 	Std_ReturnType resultfv, resultmac;
-	uint8* SecOCFreshnessValue;
-	uint8* SecOCTruncatedFreshnessValue;
-	uint8* Mac;
-	uint8* truncatedMac;
+	uint8 *SecOCFreshnessValue;
+	uint8 *SecOCTruncatedFreshnessValue;
+	uint8 *Mac;
+	uint8 *truncatedMac;
 	uint8 *tmpinterpnt = tmpinter;
-	uint8 tmpinterlen=0;
+	uint8 tmpinterlen = 0;
 	memcpy(tmpinterpnt, SecOCintermidate.adatachar, SecOCintermidate.len);
-	tmpinterlen+=SecOCintermidate.len;
-	PduInfoPtr->SduLength=0;
-	if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
-		if(tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE){
+	tmpinterlen += SecOCintermidate.len;
+	PduInfoPtr->SduLength = 0;
+	if (tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC)
+	{
+		if (tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE)
+		{
 			resultfv = SecOC_GetTxFreshnessTruncData(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId,
-					SecOCFreshnessValue,
-					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength,
-					SecOCTruncatedFreshnessValue,
-					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength);
-			*(tmpinter+tmpinterlen) = SecOCTruncatedFreshnessValue;
-			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength;
-		}else{
-			resultfv = SecOC_GetTxFreshness(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId,
-					SecOCFreshnessValue,
-					tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength);
-			*(tmpinter+tmpinterlen) = SecOCFreshnessValue;
-			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength;
-
+													 SecOCFreshnessValue,
+													 tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength,
+													 SecOCTruncatedFreshnessValue,
+													 tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength);
+			*(tmpinter + tmpinterlen) = SecOCTruncatedFreshnessValue;
+			tmpinterlen += tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueTruncLength;
 		}
-	}else{  //rte
-		if(tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE){
+		else
+		{
+			resultfv = SecOC_GetTxFreshness(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId,
+											SecOCFreshnessValue,
+											tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength);
+			*(tmpinter + tmpinterlen) = SecOCFreshnessValue;
+			tmpinterlen += tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueLength;
+		}
+	}
+	else
+	{ //rte
+		if (tmpSecOCTxPduProcessing[pduid].SecOCProvideTxTruncatedFreshnessValue == TRUE)
+		{
 			resultfv = FreshnessManagement_GetTxFreshnessTruncData();
-		}else{
+		}
+		else
+		{
 			resultfv = FreshnessManagement_GetTxFreshness();
 		}
 	}
 
-	if( resultfv ==E_OK){
+	if (resultfv == E_OK)
+	{
 
-		resultmac = Csm_MacGenerate(SecOCTxPduProcessing[pduid].SecOCTxAuthServiceConfigRef,0,tmpinter, tmpinterlen,truncatedMac, tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength);
-		if(resultmac == E_OK){
+		resultmac = Csm_MacGenerate(SecOCTxPduProcessing[pduid].SecOCTxAuthServiceConfigRef, 0, tmpinter, tmpinterlen, truncatedMac, tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength);
+		if (resultmac == E_OK)
+		{
 
-			*(tmpinter+tmpinterlen) = truncatedMac;
-			tmpinterlen+=tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength;
+			*(tmpinter + tmpinterlen) = truncatedMac;
+			tmpinterlen += tmpSecOCTxPduProcessing[pduid].SecOCAuthInfoTruncLength;
 			memcpy(SecOCintermidate.sdatachar, tmpinter, tmpinterlen);
 			SecOCintermidate.slen = tmpinterlen;
-//			updatePreTxValue(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId, SecOCFreshnessValue);
+			//			updatePreTxValue(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueId, SecOCFreshnessValue);
 
-			if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
+			if (tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC)
+			{
 				SecOC_SPduTxConfirmation(tmpSecOCTxPduProcessing[pduid].SecOCFreshnessValueID);
-			}else{//RTE
+			}
+			else
+			{ //RTE
 				FreshnessManagement_SPduTxConfirmation();
 			}
 			PduInfoPtr->SduDataPtr = SecOCintermidat.sdatachar;
 			PduInfoPtr->SduLength = SecOCintermidat.slen;
-		}else if(resultmac == E_NOT_OK || KEY_FAILURE){ //不可恢复错误
-			judgePattern=1;
-		}else{  //可恢复错误 abc+=1
-			SecOCintermidate.abc+=1;
-			if(SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts){
-				judgePattern=1;
+		}
+		else if (resultmac == E_NOT_OK || KEY_FAILURE)
+		{ //不可恢复错误
+			judgePattern = 1;
+		}
+		else
+		{ //可恢复错误 abc+=1
+			SecOCintermidate.abc += 1;
+			if (SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts)
+			{
+				judgePattern = 1;
 			}
-
 		}
-	}else if(resultfv ==E_BUSY){
-		SecOCintermidate.abc+=1;
-		if(SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts){
-			judgePattern=1;
+	}
+	else if (resultfv == E_BUSY)
+	{
+		SecOCintermidate.abc += 1;
+		if (SecOCintermidate.abc == tmpSecOCTxPduProcessing[pduid].SecOCAuthenticationBuildAttempts)
+		{
+			judgePattern = 1;
 		}
-	}else{ // 不可恢复错误
-		judgePattern=1;
+	}
+	else
+	{ // 不可恢复错误
+		judgePattern = 1;
 	}
 
-
-	if(judgePattern==1){
-		if(tmpSecOCGeneral.SecOCDefaultAuthenticationInformationPattern>-1){
-			result =SecOC_SendDefaultAuthenticationInformation(curSecOCTxPduProcessing.SecOCFreshnessValueId, 1);
-		}else{
-			SecOCintermidate.len=0;
+	if (judgePattern == 1)
+	{
+		if (tmpSecOCGeneral.SecOCDefaultAuthenticationInformationPattern > -1)
+		{
+			result = SecOC_SendDefaultAuthenticationInformation(curSecOCTxPduProcessing.SecOCFreshnessValueId, 1);
+		}
+		else
+		{
+			SecOCintermidate.len = 0;
 		}
 		report_DET(SECOC_E_CRYPTO_FAILURE);
 	}
-
-
-
 }
 
 // ******************FUNCTION***********************
-void verify(SecOCintermidateRx_type SecOCintermidatRx, VerificationResultType verificationResult, SecOCRxPduProcessing_type curSecOCRxPduProcessing){
+// void verify(SecOCintermidateRx_type SecOCintermidatRx, VerificationResultType verificationResult, SecOCRxPduProcessing_type curSecOCRxPduProcessing) {
 
+// 	uint8 idx = 0;
+
+// 	uint8* SecOCTruncatedFreshnessValue;
+// 	uint16 SecOCAuthDataFreshnessValueLength;
+// 	const uint8* SecOCAuthDataFreshnessValue;
+// 	uint8* SecOCFreshnessValue;
+// 	uint32* SecOCFreshnessValueLength;
+
+// 	Std_ReturnType resultfv, resultmac;
+
+
+// 	SecOCTruncatedFreshnessValue = SecOCintermidatRx.sdatachar; //新鲜值
+
+// 	if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
+// 		if(curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE){
+// 			resultfv = SecOC_GetRxFreshnessAuthData(
+// 					curSecOCRxPduProcessing.SecOCFreshnessValueId,
+// 					SecOCTruncatedFreshnessValue,
+// 					curSecOCRxPduProcessing.SecOCFreshnessValueTruncLength,
+// 					SecOCAuthDataFreshnessValue,     //该参数保存了接收到的尚未经过身份验证的PDU的一部分。该参数是可选的(参见描述)。
+// 					SecOCAuthDataFreshnessValueLength,    //以位为单位，保存authentic PDU的新鲜度的长度。该参数是可选的(参见描述)。
+// 					SecOCintermidatRx.avac,
+// 					SecOCFreshnessValue,        //输出
+// 					SecOCFreshnessValueLength);
+// //						curSecOCRxPduProcessing.SecOCAuthDataFreshnessStartPosition, curSecOCRxPduProcessing.SecOCAuthDataFreshnessLen);
+// 		}else{
+// 			resultfv = SecOC_GetRxFreshness(
+// 					curSecOCRxPduProcessing.SecOCFreshnessValueId,
+// 					SecOCTruncatedFreshnessValue,
+// 					curSecOCRxPduProcessing.SecOCTruncatedFreshnessValueLength,
+// 					curSecOCRxPduProcessing.avac,
+// 					SecOCFreshnessValue,        //输出
+// 					SecOCFreshnessValueLength);
+// 		}
+// 	}else{  //rte
+// 		if(curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE){
+// 			resultfv = FreshnessManagement_GetRxFreshnessAuthData(SecOCAuthDataFreshnessStartPosition, SecOCAuthDataFreshnessLen );
+// 		}else{
+// 			resultfv = FreshnessManagement_GetRxFreshness();
+// 		}
+// 	}
+
+// 	if(resultfv ==E_OK){
+// 		resultmac = Csm_MacVerify();
+// 		if(resultmac == E_OK){
+// 			if(pass){
+// 				VerificationResultType=SECOC_VERIFICATIONSUCCESS;
+// 			}else{   //mac验证失败
+// 				SecOCintermidatRx.abc=0;
+// 				SecOCintermidatRx.avac+=1;
+// 				if(SecOCintermidatRx.avac == curSecOCRxPduProcessing.SecOCAuthenticationVerifyAttempts){
+
+// 					VerificationResultType = SECOC_VERIFICATIONFAILURE;
+// 					drop( s-pdu);
+// 					if(SecOC_VerifyStatusOverride){
+// 						doby(overrideStatus);
+// 					}
+// 				}
+// 			}
+
+// 		}else if(resultmac == E_NOT_OK || KEY_FAILURE){ //不可恢复错误
+// 			drop( s-pdu);
+// 			VerificationResultType = SECOC_VERIFICATIONFAILURE;
+// 			if(SecOC_VerifyStatusOverride){
+// 				doby(overrideStatus);
+// 			}
+
+// 		}else{  //E_BUSY, QUEUE_FULL
+// 			SecOCintermidatRx.abc+=1;
+// 			if(SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts){
+// 				drop( s-pdu);
+// 				VerificationResultType = SECOC_AUTHENTICATIONBUILDFAILURE;
+// 				if(SecOC_VerifyStatusOverride){
+// 					doby(overrideStatus);
+// 				}
+// 			}
+
+// 		}
+// 	}else if(resultfv ==E_BUSY){
+// 		SecOCintermidatRx.abc+=1;
+// 		if(SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts){
+// 			drop( s-pdu);
+// 			VerificationResultType = SECOC_AUTHENTICATIONBUILDFAILURE;
+// 			if(SecOC_VerifyStatusOverride){
+// 				doby(overrideStatus);
+// 			}
+// 		}
+// 	}else{ // 不可恢复错误   E_NOT_OK
+// //
+// 		drop( a-pdu);
+// 		VerificationResultType =SECOC_FRESHNESSFAILURE;
+// 	}
+
+
+// }
+
+FUNC(void, SECOC_CODE)
+verify(VAR(SecOCintermidateRx_type, SECOC_APPL_DATA) SecOCintermidatRx, VAR(VerificationResultType, SECOC_APPL_DATA) verificationResult, VAR(SecOCRxPduProcessing_type, SECOC_APPL_DATA) curSecOCRxPduProcessing) {
 	uint8 idx = 0;
 
-	uint8* SecOCTruncatedFreshnessValue;
+	uint8 *SecOCTruncatedFreshnessValue;
 	uint16 SecOCAuthDataFreshnessValueLength;
-	const uint8* SecOCAuthDataFreshnessValue;
-	uint8* SecOCFreshnessValue;
-	uint32* SecOCFreshnessValueLength;
+	const uint8 *SecOCAuthDataFreshnessValue;
+	uint8 *SecOCFreshnessValue;
+	uint32 *SecOCFreshnessValueLength;
 
 	Std_ReturnType resultfv, resultmac;
 
-
 	SecOCTruncatedFreshnessValue = SecOCintermidatRx.sdatachar; //新鲜值
 
-	if(tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC ){
-		if(curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE){
+	if (tmpSecOCGeneral.SecOCQueryFreshnessValue == CFUNC)
+	{
+		if (curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE)
+		{
 			resultfv = SecOC_GetRxFreshnessAuthData(
-					curSecOCRxPduProcessing.SecOCFreshnessValueId,
-					SecOCTruncatedFreshnessValue,
-					curSecOCRxPduProcessing.SecOCFreshnessValueTruncLength,
-					SecOCAuthDataFreshnessValue,     //该参数保存了接收到的尚未经过身份验证的PDU的一部分。该参数是可选的(参见描述)。
-					SecOCAuthDataFreshnessValueLength,    //以位为单位，保存authentic PDU的新鲜度的长度。该参数是可选的(参见描述)。
-					SecOCintermidatRx.avac,
-					SecOCFreshnessValue,        //输出
-					SecOCFreshnessValueLength);
-//						curSecOCRxPduProcessing.SecOCAuthDataFreshnessStartPosition, curSecOCRxPduProcessing.SecOCAuthDataFreshnessLen);
-		}else{
-			resultfv = SecOC_GetRxFreshness(
-					curSecOCRxPduProcessing.SecOCFreshnessValueId,
-					SecOCTruncatedFreshnessValue,
-					curSecOCRxPduProcessing.SecOCTruncatedFreshnessValueLength,
-					curSecOCRxPduProcessing.avac,
-					SecOCFreshnessValue,        //输出
-					SecOCFreshnessValueLength);
+				curSecOCRxPduProcessing.SecOCFreshnessValueId,
+				SecOCTruncatedFreshnessValue,
+				curSecOCRxPduProcessing.SecOCFreshnessValueTruncLength,
+				SecOCAuthDataFreshnessValue,	   //该参数保存了接收到的尚未经过身份验证的PDU的一部分。该参数是可选的(参见描述)。
+				SecOCAuthDataFreshnessValueLength, //以位为单位，保存authentic PDU的新鲜度的长度。该参数是可选的(参见描述)。
+				SecOCintermidatRx.avac,
+				SecOCFreshnessValue, //输出
+				SecOCFreshnessValueLength);
+			//						curSecOCRxPduProcessing.SecOCAuthDataFreshnessStartPosition, curSecOCRxPduProcessing.SecOCAuthDataFreshnessLen);
 		}
-	}else{  //rte
-		if(curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE){
-			resultfv = FreshnessManagement_GetRxFreshnessAuthData(SecOCAuthDataFreshnessStartPosition, SecOCAuthDataFreshnessLen );
-		}else{
+		else
+		{
+			resultfv = SecOC_GetRxFreshness(
+				curSecOCRxPduProcessing.SecOCFreshnessValueId,
+				SecOCTruncatedFreshnessValue,
+				curSecOCRxPduProcessing.SecOCTruncatedFreshnessValueLength,
+				curSecOCRxPduProcessing.avac,
+				SecOCFreshnessValue, //输出
+				SecOCFreshnessValueLength);
+		}
+	}
+	else
+	{ //rte
+		if (curSecOCRxPduProcessing.SecOCUseAuthDataFreshness == TRUE)
+		{
+			resultfv = FreshnessManagement_GetRxFreshnessAuthData(SecOCAuthDataFreshnessStartPosition, SecOCAuthDataFreshnessLen);
+		}
+		else
+		{
 			resultfv = FreshnessManagement_GetRxFreshness();
 		}
 	}
 
-	if(resultfv ==E_OK){
+	if (resultfv == E_OK)
+	{
 		resultmac = Csm_MacVerify();
-		if(resultmac == E_OK){
-			if(pass){
-				VerificationResultType=SECOC_VERIFICATIONSUCCESS;
-			}else{   //mac验证失败
-				SecOCintermidatRx.abc=0;
-				SecOCintermidatRx.avac+=1;
-				if(SecOCintermidatRx.avac == curSecOCRxPduProcessing.SecOCAuthenticationVerifyAttempts){
+		if (resultmac == E_OK)
+		{
+			if (pass)
+			{
+				VerificationResultType = SECOC_VERIFICATIONSUCCESS;
+			}
+			else
+			{ //mac验证失败
+				SecOCintermidatRx.abc = 0;
+				SecOCintermidatRx.avac += 1;
+				if (SecOCintermidatRx.avac == curSecOCRxPduProcessing.SecOCAuthenticationVerifyAttempts)
+				{
 
 					VerificationResultType = SECOC_VERIFICATIONFAILURE;
-					drop( s-pdu);
-					if(SecOC_VerifyStatusOverride){
+					drop(s - pdu);
+					if (SecOC_VerifyStatusOverride)
+					{
 						doby(overrideStatus);
 					}
 				}
 			}
-
-		}else if(resultmac == E_NOT_OK || KEY_FAILURE){ //不可恢复错误
-			drop( s-pdu);
+		}
+		else if (resultmac == E_NOT_OK || KEY_FAILURE)
+		{ //不可恢复错误
+			drop(s - pdu);
 			VerificationResultType = SECOC_VERIFICATIONFAILURE;
-			if(SecOC_VerifyStatusOverride){
+			if (SecOC_VerifyStatusOverride)
+			{
 				doby(overrideStatus);
 			}
-
-		}else{  //E_BUSY, QUEUE_FULL
-			SecOCintermidatRx.abc+=1;
-			if(SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts){
-				drop( s-pdu);
+		}
+		else
+		{ //E_BUSY, QUEUE_FULL
+			SecOCintermidatRx.abc += 1;
+			if (SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts)
+			{
+				drop(s - pdu);
 				VerificationResultType = SECOC_AUTHENTICATIONBUILDFAILURE;
-				if(SecOC_VerifyStatusOverride){
+				if (SecOC_VerifyStatusOverride)
+				{
 					doby(overrideStatus);
 				}
 			}
-
 		}
-	}else if(resultfv ==E_BUSY){
-		SecOCintermidatRx.abc+=1;
-		if(SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts){
-			drop( s-pdu);
+	}
+	else if (resultfv == E_BUSY)
+	{
+		SecOCintermidatRx.abc += 1;
+		if (SecOCintermidatRx.abc == curSecOCRxPduProcessing.SecOCAuthenticationBuildAttempts)
+		{
+			drop(s - pdu);
 			VerificationResultType = SECOC_AUTHENTICATIONBUILDFAILURE;
-			if(SecOC_VerifyStatusOverride){
+			if (SecOC_VerifyStatusOverride)
+			{
 				doby(overrideStatus);
 			}
 		}
-	}else{ // 不可恢复错误   E_NOT_OK
-//
-		drop( a-pdu);
-		VerificationResultType =SECOC_FRESHNESSFAILURE;
 	}
-
-
+	else
+	{	// 不可恢复错误   E_NOT_OK
+		//
+		drop(a - pdu);
+		VerificationResultType = SECOC_FRESHNESSFAILURE;
+	}
 }
 
 // ******************FUNCTION***********************
-void SecOC_VerificationStatusCallout (SecOC_VerificationStatusType verificationStatus){
+// void SecOC_VerificationStatusCallout (SecOC_VerificationStatusType verificationStatus){
 
-}
+// }
 
+FUNC(void, SECOC_CODE)
+SecOC_VerificationStatusCallout(VAR(SecOC_VerificationStatusType, SECOC_APPL_DATA) verificationStatus) {}

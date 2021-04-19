@@ -50,7 +50,7 @@ SecOCMainFunctionPeriodTx;  //发送周期
 // ******************FUNCTION***********************
 //void SecOC_Init (const SecOC_ConfigType* config);
 FUNC(void, SECOC_CODE)
-secOc_Init(P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA) config);
+secOc_Init(P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_CONST) config);
 /*
 0x01 同步 非重入
 初始化SECOC模块。成功初始化会导致状态SEC OC_INIT。
@@ -73,7 +73,7 @@ SecOC_GetVersionInfo(P2VAR(Std_VersionInfoType, AUTOMATIC, SECOC_APPL_DATA) vers
 // ******************FUNCTION***********************
 // Std_ReturnType SecOC_IfTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
 FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SECOC_CODE)
-SecOC_IfTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr);
+SecOC_IfTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST) PduInfoPtr);
 //0x49 同步 可重入不同的PduId。不可重入相同的PduId。 参考7.4
 //E_OK: 传输请求已被接受。
 //E_NOT_OK: 传输请求未被接受
@@ -81,7 +81,7 @@ SecOC_IfTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType
 // ******************FUNCTION***********************
 // Std_ReturnType SecOC_TpTransmit ( PduIdType TxPduId, const PduInfoType* PduInfoPtr );
 FUNC(VAR(Std_ReturnType, STD_TYPES_VAR) SECOC_CODE)
-SecOC_TpTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr);
+SecOC_TpTransmit(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST) PduInfoPtr);
 //0x49 同步 可重入不同的PduId。不可重入相同的PduId。 参考7.4
 //E_OK: 传输请求已被接受。
 //E_NOT_OK: 传输请求未被接受
@@ -163,7 +163,7 @@ SecOC_SendDefaultAuthenticationInformation(
 FUNC(void, SECOC_CODE)
 SecOC_RxIndication(
 	VAR(PduIdType, COMSTACK_TYPES_VAR) RxPduId,
-	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST) PduInfoPtr
 );
 //0x42 同步 可重入不同的PduId。不可重入相同的PduId。
 //从底层通信接口模块收到的PDU指示
@@ -225,7 +225,7 @@ SecOC_TriggerTransmit(
 FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
 SecOC_CopyRxData(
 	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
-	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) info,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST) info,
 	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA) bufferSizePtr //输出
 );
 //0x44 同步 可重入
@@ -242,8 +242,8 @@ SecOC_CopyRxData(
 FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
 SecOC_CopyTxData(
 	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
-	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) info,
-	P2CONST(RetryInfoType, AUTOMATIC, SECOC_APPL_DATA) retry,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST) info,
+	P2CONST(RetryInfoType, AUTOMATIC, SECOC_APPL_CONST) retry,
 	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA) availableDataPtr //输出
 );
 //0x43 同步 可重入
@@ -265,7 +265,7 @@ SecOC_CopyTxData(
 FUNC(VAR(BufReq_ReturnType, COMSTACK_TYPES_VAR), SECOC_CODE)
 SecOC_StartOfReception(
 	VAR(PduIdType, COMSTACK_TYPES_VAR) id,
-	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA)info,
+	P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST)info,
 	VAR(PduLengthType, COMSTACK_TYPES_VAR) TpSduLength,
 	P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA)bufferSizePtr
 );

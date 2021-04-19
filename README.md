@@ -49,13 +49,13 @@
 
 </br>
 
-`const PduInfoType*`: `P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA)`
+`const PduInfoType*`: `P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_CONST)`
 
-`const SecOC_ConfigType*`: `P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA)`
+`const SecOC_ConfigType*`: `P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_CONST)`
 
-`const RetryInfoType*`: `P2CONST(RetryInfoType, AUTOMATIC, SECOC_APPL_DATA)`
+`const RetryInfoType*`: `P2CONST(RetryInfoType, AUTOMATIC, SECOC_APPL_CONST)`
 
-`const SecOC_ConfigType *`: `P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_DATA)`
+`const SecOC_ConfigType *`: `P2CONST(SecOC_ConfigType, AUTOMATIC, SECOC_APPL_CONST)`
 
 </br>
 

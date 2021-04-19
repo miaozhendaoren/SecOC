@@ -64,6 +64,7 @@
 
 // ptrclass
 #define SECOC_APPL_DATA
+#define SECOC_APPL_CONST
 
 #define SLAVE_APPL_DATA
 #define SLAVE_APPL_CONST
