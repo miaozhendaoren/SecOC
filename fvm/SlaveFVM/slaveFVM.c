@@ -119,20 +119,6 @@ FVM_updateReset(VAR(PduIdType,COMSTACK_TYPES_VAR) TxPduId,P2CONST(PduInfoType,SL
 }
 
 //下面两个函数是sender slave的部分
-FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE) 
-FVM_GetTxFreshness(
-	VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,
-	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
-	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength
-){
-
-	/*
-	1.根据SecOCFreshnessValueID 作为索引找到需要对应的 resetCnt[id], preTrip, msgCnt[]
-	2.通过比较各计数器上一次发送值和当前值，构造新鲜值。
-	3.将新鲜值按照 trip reset msg进行构造
-
-	*/
-}  //获得数据消息canid对应的fv
 
 //获取新鲜值及 裁剪新鲜值
 FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE) 
@@ -148,6 +134,18 @@ FVM_GetTxFreshness(
 	4.根据SecOCTruncatedFreshnessValueLength长度，截取msg中后(SecOCTruncatedFreshnessValueLength-2)比特位长度+2比特位reset flag（reset后两位）构造SecOCTruncatedFreshnessValue
 	参考图
 	*/
+}
+
+
+FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
+FvM_GetTxFreshnessTruncData(
+	VAR(uint16,FRESH_VAR) SecOCFreshnessValueID,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCFreshnessValueLength,
+	P2VAR(uint8,SLAVE_CODE,SLAVE_APPL_DATA) SecOCTruncatedFreshnessValue,
+	P2VAR(uint32,SLAVE_CODE,SLAVE_APPL_DATA) SecOCTruncatedFreshnessValueLength
+){
+	
 }
 
 

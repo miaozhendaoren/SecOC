@@ -1,7 +1,11 @@
+[toc]
+
 # SecOC
 
+## 代码重构
 
-## Slave模块
+### Slave模块
+
 `Std_ReturnType` :
     `FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)`
 
@@ -29,7 +33,7 @@
 `const uint8* SecOCTruncatedFreshnessValue,` :
     ``
 
-## SecOC 模块
+### SecOC 模块
 
 `Std_ReturnType`: `VAR(Std_ReturnType, STD_TYPES_VAR)`
 
@@ -64,4 +68,64 @@
 `PduInfoType*`: `P2VAR(PduInfoType, AUTOMATIC, SECOC_APPL_DATA)`
 
 `PduLengthType*`: `P2VAR(PduLengthType, AUTOMATIC, SECOC_APPL_DATA)`
+
+
+
+## 接口实现
+
+### 说明
+
+- 进行某接口的编码前，应将其功能记录在此文档中
+- 使用`CUint`完成单元测试
+
+### DDL
+
+- 5.10日前完成FVM部分的接口实现
+- 5.11日前完成FVM部分的接口测试
+
+### MasterFVM
+
+#### step1：接口的实现
+
+- 完成人：赵宸阳
+
+##### MasterFVM_Init
+
+##### MasterFVM_getTripValue
+
+##### MasterFVM_getResetValue
+
+##### MasterFVM_changestate
+
+##### MasterFVM_MainTx
+
+#### step2：单元测试
+
+### SlaveFVM
+
+#### step1：接口的实现
+
+- 完成人：李兴诚、张文涛
+
+##### FVM_changestate
+
+##### FVM_Syn_check
+
+##### FVM_updateTrip
+
+##### FVM_updateReset
+
+##### FVM_GetTxFreshness
+
+##### FvM_GetTxFreshnessTruncData
+
+##### FVM_GetRxFreshness
+
+##### FVM_GetRxFreshnessAuthData
+
+##### FVM_updatePreValue
+
+#### step2：单元测试
+
+### Secoc
 
