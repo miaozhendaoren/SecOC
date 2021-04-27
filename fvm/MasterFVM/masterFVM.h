@@ -22,6 +22,3 @@ MasterFVM_changestate(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId);
 FUNC(void, MASTER_CODE)
 MasterFVM_MainTx(void);
 
-
-
-

@@ -87,17 +87,45 @@
 
 #### step1：接口的实现
 
-- 完成人：赵宸阳
 
 ##### MasterFVM_Init
 
+- 完成人：赵宸阳
+
+- 功能：
+    - 此函数是在Master启动时调用，将trip计数器加一
+
 ##### MasterFVM_getTripValue
+
+- 完成人：赵宸阳
+
+- 功能：
+    - 此函数接受一个`PduInfoType`指针，向其中填入trip消息的内容
 
 ##### MasterFVM_getResetValue
 
+- 完成人：赵宸阳
+
+- 功能：
+    - 此函数接受一个`PduIdType`类型的id值和一个`PduInfoType`指针
+    - 首先判断id值是否有效，接着向`PduInfoType`指针中填入reset消息的内容
+
 ##### MasterFVM_changestate
 
+- 完成人：赵宸阳
+
+- 功能：
+    - 此函数在trip同步消息的Ack报文到达master调用
+    - 此函数发送一个ack确认报文回slave并修改master的状态
+
 ##### MasterFVM_MainTx
+
+- 完成人：赵宸阳
+
+- 功能：
+    - 此函数为周期被调用的函数
+    - 在trip同步完成之前，周期发送trip同步消息
+    - 在trip同步完成之后，周期发送reset同步消息
 
 #### step2：单元测试
 
@@ -105,25 +133,41 @@
 
 #### step1：接口的实现
 
-- 完成人：李兴诚、张文涛
-
 ##### FVM_changestate
+
+- 完成人：李兴诚
 
 ##### FVM_Syn_check
 
+- 完成人：李兴诚
+
 ##### FVM_updateTrip
+
+- 完成人：张文涛
 
 ##### FVM_updateReset
 
+- 完成人：张文涛
+
 ##### FVM_GetTxFreshness
+
+- 完成人：李兴诚
 
 ##### FvM_GetTxFreshnessTruncData
 
+- 完成人：李兴诚
+
 ##### FVM_GetRxFreshness
+
+- 完成人：张文涛
 
 ##### FVM_GetRxFreshnessAuthData
 
+- 完成人：张文涛
+
 ##### FVM_updatePreValue
+
+- 完成人：李兴诚
 
 #### step2：单元测试
 
