@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "i2c.h": "c",
+        "masterfvm.h": "c",
+        "macgenerate.h": "c",
+        "compiler_cfg.h": "c",
+        "masterfvm_cfg.h": "c",
+        "masterfvm_types.h": "c"
+    }
+}

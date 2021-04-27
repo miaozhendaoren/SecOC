@@ -16,4 +16,4 @@ typedef struct {
 	uint32 resetSynTime;
 }ResetCnt_Type;
 
-
+#endif

@@ -1,6 +1,7 @@
 //#include "i2c.h"
 // #include "type.h"
 #include "MasterFVM_Cfg.h"
+#include "compiler.h"
 
 // void MasterFVM_Init(void);
 FUNC(void, MASTER_CODE)

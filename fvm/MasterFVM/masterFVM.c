@@ -1,17 +1,35 @@
-#include "i2c.h"
+// #include "i2c.h"
 #include "masterFVM.h"
 #include "MacGenerate.h"
-#include "usart.h"
-#include "fvm_conf.h"
+#include "Csm_Types.h"
+#include "Compiler_Cfg.h"
+#include "MasterFVM_Cfg.h"
+// #include "usart.h"
+// #include "fvm_conf.h"
 
 #define ADDR_24LCxx_Write 0xA0
 #define ADDR_24LCxx_Read 0xA1
+#define NULL 0
 
 uint8 trip[3];			  //初始化时从非易失性存储器中获得并+1后再存回非易失性存储器， 低位先占满8字节 高位再占
 						  //例如  TripCntLength=11  且trip=0x04 0xff       [0000 0100][1111 1111][]
 uint8 TripCntLength = 16; //可配置
 
-FUNC(void, MASTER_CODE)
+// 返回一个uint8的实际位数
+uint8 length(uint8 num)
+{
+	int temp = 0;
+	while (num)
+	{
+		temp += 1;
+		num >>= 1;
+	}
+	return temp;
+}
+
+
+
+FUNC(void, MASTER_CODE) 
 MasterFVM_Init(void)
 {
 	/*
@@ -23,36 +41,43 @@ MasterFVM_Init(void)
 
 	*/
 
-	//需先判断TripCntLength长度，确定多少数组元素需要管理
-	uint8 i;
-	HAL_I2C_Mem_Read(&hi2c1, ADDR_24LCxx_Read, 0, I2C_MEMADD_SIZE_8BIT, trip, 2, 0xff); //读取2字节的trip
-
+	// HAL_I2C_Mem_Read(&hi2c1, ADDR_24LCxx_Read, 0, I2C_MEMADD_SIZE_8BIT, trip, 2, 0xff); //读取2字节的trip
+	
+	// 表面Read
+	trip[1] = 153;
+	trip[0] = 222;
+	
 	if (trip[1] == 255)
 	{ //低位满，需进位
 		if (trip[0] == 255)
 		{ //trip值达到最大值
 			trip[0] = 0;
 			trip[1] = 1;
+			TripCntLength = 1;
 		}
 		else
 		{ //trip未达最大值， 高位进位，低位到0
 			trip[0] += 1;
 			trip[1] = 0;
+			TripCntLength = (uint8)8 + length(trip[0]);
 		}
 	}
 	else
 	{
 		trip[1] += 1;
+		TripCntLength = (uint8)8 + length(trip[0]);
 	}
 
-	for (i = 0; i < 2; i++)
-	{
-		HAL_I2C_Mem_Write(&hi2c1, ADDR_24LCxx_Write, i, I2C_MEMADD_SIZE_8BIT, &trip[i], 1, 0xff); //使用I2C块读，出错。因此采用此种方式，逐个单字节写入
-		HAL_Delay(5);																			  //此处延时必加，与AT24C02写时序有关
-	}
+	// for (i = 0; i < 2; i++)
+	// {
+	// 	HAL_I2C_Mem_Write(&hi2c1, ADDR_24LCxx_Write, i, I2C_MEMADD_SIZE_8BIT, &trip[i], 1, 0xff); //使用I2C块读，出错。因此采用此种方式，逐个单字节写入
+	// 	HAL_Delay(5);																			  //此处延时必加，与AT24C02写时序有关
+	// }
 }
 
-uint16 tripcanid = 0x2bd; //可配置
+uint16 trip_can_id = 0x2bd;		   //可配置
+uint32 jobId = 2333;			   // 自定义
+Crypto_OperationModeType mode = 3; // 自定义
 
 FUNC(void, MASTER_CODE)
 MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr)
@@ -70,6 +95,39 @@ MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoP
 	3. 数据排版 PduInfoPtr.SduDataPtr =trip(TripCntLength)+1(1bit)+ mac(64bit-TripCntLength-1);  
 		重排位，在数据生成时不再填充0
 	*/
+
+	uint8 data[8];
+	memset(data, 0, sizeof(data));
+
+	// 加入tripcanid
+	data[0] = (uint8)(trip_can_id >> 8);
+	data[1] = (uint8)trip_can_id;
+
+	// 加入左移后的trip值
+	uint16 data_trip = trip[0];
+	data_trip <<= 8;
+	data_trip += trip[1];
+	data_trip <<= (16 - TripCntLength);
+	data[2] = (uint8)(data_trip >> 8);
+	data[3] = (uint8)(data_trip);
+
+	// 加入reset值
+	uint8 data_reset = 1;
+	data_reset <<= (16 - TripCntLength - 1);
+	data[3] += data_reset;
+
+	// 生成mac值
+	uint8 mac[8];
+	uint8 mac_length[8];
+	Csm_MacGenerate(jobId, mode, data, 16 + TripCntLength + 1, mac, mac_length);
+
+	// 数据重排
+	for(int i=0;i<8;++i){
+
+	}
+
+
+	PduInfoPtr = data;
 }
 
 FUNC(void, MASTER_CODE)
@@ -95,8 +153,8 @@ MasterFVM_getResetValue(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduI
 		重排位，在数据生成时不再填充0
 	
 	*/
-	if(TxPduId < NUM_RESET){
-		
+	if (TxPduId < NUM_RESET)
+	{
 	}
 }
 
@@ -104,11 +162,11 @@ FUNC(void, MASTER_CODE)
 MasterFVM_changestate(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId)
 {
 	/* 收到id后检查confirmECU 对应索引值， 修改state状态为1， 发送ackv的报文*/
-	ConfirmECU_Type tmp *;
+	ConfirmECU_Type* tmp;
 	tmp = &confirmECU[TxPduId];
-	tmp.state = 1;
-	PduInfoPtr info;
-	CanIf_Transmit(tmp.ackv, info);
+	tmp->state = 1;
+	PduInfoType* info;
+	CanIf_Transmit(tmp->ackv, info);
 }
 
 uint8 firsttrip = 0;	  //标记是否发送过trip
@@ -147,11 +205,11 @@ MasterFVM_MainTx(void)
 	*/
 
 	unsigned char i;
-	const PduInfoType *info;
+	PduInfoType *info;
 	if (firsttrip == 0)
 	{
 		MasterFVM_getTripValue(info);
-		CanIf_Transmit(tripcanid, info);
+		CanIf_Transmit(trip_can_id, info);
 		firsttrip = 1;
 	}
 
@@ -183,7 +241,7 @@ MasterFVM_MainTx(void)
 					else
 					{
 						MasterFVM_getTripValue(info);
-						CanIf_Transmit(tripcanid, info);
+						CanIf_Transmit(trip_can_id, info);
 						resendTriptag = 0;
 						windowTimetag = 0;
 					}
