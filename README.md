@@ -108,7 +108,7 @@
 
 - 功能：
     - 此函数接受一个`PduIdType`类型的id值和一个`PduInfoType`指针
-    - 首先判断id值是否有效，接着向`PduInfoType`指针中填入reset消息的内容
+    - id值为reset消息的canId，`PduInfoType`指针中需要填入reset消息的内容
 
 ##### MasterFVM_changestate
 

@@ -27,9 +27,27 @@ uint8 length(uint8 num)
 	return temp;
 }
 
+// k=0..8,设置num的第k位为1
+uint8 set_k(uint8 num, uint8 k)
+{
+	num += 1 << k;
+	return num;
+}
 
+//第k位是否为1
+uint8 is_k(uint8 num, uint8 k)
+{
+	if (num & (1 << k))
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
 
-FUNC(void, MASTER_CODE) 
+FUNC(void, MASTER_CODE)
 MasterFVM_Init(void)
 {
 	/*
@@ -42,11 +60,11 @@ MasterFVM_Init(void)
 	*/
 
 	// HAL_I2C_Mem_Read(&hi2c1, ADDR_24LCxx_Read, 0, I2C_MEMADD_SIZE_8BIT, trip, 2, 0xff); //读取2字节的trip
-	
+
 	// 表面Read
 	trip[1] = 153;
 	trip[0] = 222;
-	
+
 	if (trip[1] == 255)
 	{ //低位满，需进位
 		if (trip[0] == 255)
@@ -78,6 +96,147 @@ MasterFVM_Init(void)
 uint16 trip_can_id = 0x2bd;		   //可配置
 uint32 jobId = 2333;			   // 自定义
 Crypto_OperationModeType mode = 3; // 自定义
+ResetCnt_Type current_reset;
+
+void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength, uint8 ResetCntLength)
+{
+	uint8 can_data[8];
+	memset(can_data, 0, sizeof(can_data));
+
+	// 声明两个存data的变量
+	uint16 data_reset_num;
+	uint16 data_trip;
+
+	uint8 data_generate_mac[8];
+	memset(data_generate_mac, 0, sizeof(data_generate_mac));
+	// 向生成mac的原始数据加入canid
+
+	data_generate_mac[0] = (uint8)(can_id >> 8);
+	data_generate_mac[1] = (uint8)can_id;
+
+	// 左移trip
+	data_trip = trip[0];
+	data_trip <<= 8;
+	data_trip += trip[1];
+	data_trip <<= (16 - TripCntLength);
+
+	//向生成mac的原始数据加入trip
+	data_generate_mac[2] = (uint8)(data_trip >> 8);
+	data_generate_mac[3] = (uint8)(data_trip);
+
+	// 向生成mac的原始数据中加入ResetCnt的值
+	if (ResetCntLength == 0)
+	{
+		int flag = 0;
+		for (int i = 2; i < 8 && flag == 0; ++i)
+		{
+			uint8 num = data_generate_mac[i];
+			for (int j = 7; j >= 0; --j)
+			{ // 遇到第一个为0的为置1
+				if (!is_k(num, j))
+				{
+					data_generate_mac[i] = set_k(num, j);
+					flag = 1;
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		uint8 data_reset[2] = current_reset.resetdata;
+		data_reset_num = data_reset[0];
+		data_reset_num <<= 8;
+		data_reset_num += data_reset[1];
+		data_reset_num <<= (16 - ResetCntLength);
+		int reset_index = 0;
+		int flag = 0;
+		for (int i = 2; i < 8 && flag == 0; ++i)
+		{
+			for (int j = 7; j >= 0; --j)
+			{
+				if (!is_k(data_generate_mac[i], j))
+				{
+					if (data_reset_num & (1 << reset_index))
+					{
+						data_generate_mac[i] = set_k(data_generate_mac[i], j);
+						reset_index++;
+					}
+					else
+					{
+						flag = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	// 生成mac值
+	uint8 mac[8];
+	uint8 mac_length[8];
+	memset(mac, 0, sizeof(mac));
+	memset(mac_length, 0, sizeof(mac_length));
+	Csm_MacGenerate(jobId, mode, data_generate_mac, 16 + TripCntLength + ResetCntLength, mac, mac_length);
+	uint64 num_mac;
+	for (int i = 0; i < 8; ++i)
+	{
+		num_mac += mac[7 - i] << (8 * i);
+	}
+	num_mac >>= (16 + TripCntLength + ResetCntLength);
+
+	uint8 mac_index = 0;
+	// 数据重排
+	if (ResetCntLength == 0)
+	{ // trip + 1 + mac
+		can_data[0] = data_trip >> 8;
+		can_data[1] = (uint8)data_trip;
+		int first = 0;
+		for (int i = 0; i < 8; ++i)
+		{
+			for (int j = 7; j >= 0; --j)
+			{
+				if (!is_k(can_data[i], j))
+				{
+					if (first)
+					{
+						first = 1;
+						can_data[i] = set_k(can_data[i], j);
+					}
+					else
+					{
+						if (num_mac & (1 << mac_index))
+						{
+							can_data[i] = set_k(can_data[i], j);
+						}
+						mac_index++;
+					}
+				}
+			}
+		}
+	}
+	else
+	{ // reset + mac
+		can_data[0] = data_reset_num >> 8;
+		can_data[1] = (uint8)data_reset_num;
+		for (int i = 0; i < 8; ++i)
+		{
+			for (int j = 7; j >= 0; --j)
+			{
+				if (!is_k(can_data[i], j))
+				{
+
+					if (num_mac & (1 << mac_index))
+					{
+						can_data[i] = set_k(can_data[i], j);
+					}
+					mac_index++;
+				}
+			}
+		}
+	}
+
+	PduInfoPtr = can_data;
+}
 
 FUNC(void, MASTER_CODE)
 MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoPtr)
@@ -87,7 +246,8 @@ MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoP
 		trip(TripCntLength)表示 这个数组实际长度由bit长度决定，在构造dataptr时需要修改各比特站位，将trip[]数组前面空位移除
 		例如 TripCntLength=11  且trip=0x04 0xff       [0000 0100][1111 1111][] 在此场景下 要左移5位改为[1001 1111][1110 0000]
 		由于后接1bit reset且值为1 则dataptr = [0x02] [0xbd] [1001 1111][1111 0000] 最后4位为补0
-	1.构造生成mac的原始数据 char *dataptr 组成为  tripcanid[2](tripcanid拆分成两个char)+trip(TripCntLength)+reset(1bit)：值为1 + padding0;
+	1.构造生成mac的原始数据 char *dataptr 组成为  
+	tripcanid[2](tripcanid拆分成两个char)+trip(TripCntLength)+reset(1bit)：值为1 + padding0;
 		在trip和reset计数器连接的总bit数构不成1个char时，在后面补0
 		例如  TripCntLength=12  [ 0x02 0xbd 0x00 0x14]  此时
 	2.调用Csm_MacGenerate(uint32 jobId, Crypto_OperationModeType mode,uint8* dataPtr, uint32 dataLength, uint8* macPtr,uint8 *macLengthPtr);
@@ -95,39 +255,7 @@ MasterFVM_getTripValue(P2CONST(PduInfoType, AUTOMATIC, SECOC_APPL_DATA) PduInfoP
 	3. 数据排版 PduInfoPtr.SduDataPtr =trip(TripCntLength)+1(1bit)+ mac(64bit-TripCntLength-1);  
 		重排位，在数据生成时不再填充0
 	*/
-
-	uint8 data[8];
-	memset(data, 0, sizeof(data));
-
-	// 加入tripcanid
-	data[0] = (uint8)(trip_can_id >> 8);
-	data[1] = (uint8)trip_can_id;
-
-	// 加入左移后的trip值
-	uint16 data_trip = trip[0];
-	data_trip <<= 8;
-	data_trip += trip[1];
-	data_trip <<= (16 - TripCntLength);
-	data[2] = (uint8)(data_trip >> 8);
-	data[3] = (uint8)(data_trip);
-
-	// 加入reset值
-	uint8 data_reset = 1;
-	data_reset <<= (16 - TripCntLength - 1);
-	data[3] += data_reset;
-
-	// 生成mac值
-	uint8 mac[8];
-	uint8 mac_length[8];
-	Csm_MacGenerate(jobId, mode, data, 16 + TripCntLength + 1, mac, mac_length);
-
-	// 数据重排
-	for(int i=0;i<8;++i){
-
-	}
-
-
-	PduInfoPtr = data;
+	get_value(trip_can_id, PduInfoPtr, TripCntLength, 0);
 }
 
 FUNC(void, MASTER_CODE)
@@ -135,14 +263,13 @@ MasterFVM_getResetValue(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduI
 {
 	/*
 	1.先判断TxPduId 若>=NUM_RESET， 则直接退出;
-	
 	默认使用数据长度为8的can通信，因此trip同步消息将由trip[],reset[],mac共同使用8字节，并将连接的结果存入pudInfoPtr中。
 		trip(TripCntLength)表示 这个数组实际长度由bit长度决定，在构造dataptr时需要修改各比特站位，将trip[]数组前面空位移除
 		例如 TripCntLength=11  且trip=0x04 0xff       [0000 0100][1111 1111][] 在此场景下 要左移5位改为[1001 1111][1110 0000]
 		由于后接ResetCntLength reset   如  ResetCntLength=11  且reset=0x04 0xff 左移5位并连接到前面trip后
 		 则dataptr = [0x00] [0x65] [1001 1111][1111 0011] [1111 1100 ]最后2位为补0
 	2.构造生成mac的原始数据 char *dataptr 组成为  
-		resetcanid[2](reset拆分成两个char, 由TxPduId作为索引找到)+trip(TripCntLength)+reset(ResetCntLength) + padding0;
+	resetcanid[2](reset拆分成两个char, 由TxPduId作为索引找到)+trip(TripCntLength)+reset(ResetCntLength) + padding0;
 		在trip和reset计数器连接的总bit数构不成1个char时，在后面补0
 		reset(ResetCntLength)值在获取后需要将resetData[3*TxPduId]对应值加1 若发生进位需要改变
 		若reset达到ResetCntLength规定的最大值，则reset不加值。
@@ -155,6 +282,8 @@ MasterFVM_getResetValue(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId, P2CONST(PduI
 	*/
 	if (TxPduId < NUM_RESET)
 	{
+		current_reset = resetCnt[TxPduId];
+		get_value(current_reset.resetcanid, PduInfoPtr, TripCntLength, current_reset.ResetCntLength);
 	}
 }
 
@@ -162,10 +291,10 @@ FUNC(void, MASTER_CODE)
 MasterFVM_changestate(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId)
 {
 	/* 收到id后检查confirmECU 对应索引值， 修改state状态为1， 发送ackv的报文*/
-	ConfirmECU_Type* tmp;
+	ConfirmECU_Type *tmp;
 	tmp = &confirmECU[TxPduId];
 	tmp->state = 1;
-	PduInfoType* info;
+	PduInfoType *info;
 	CanIf_Transmit(tmp->ackv, info);
 }
 
@@ -269,7 +398,7 @@ MasterFVM_MainTx(void)
 				if (resetCnt[i].resetSyntag >= resetCnt[i].resetSynTime)
 				{
 
-					MasterFVM_getResetValue(resetCnt[i].resetcanid, info);
+					MasterFVM_getResetValue(i, info);
 					CanIf_Transmit(notifycanid, info);
 					resetCnt[i].resetSyntag = 0; //重新计数
 					break;
