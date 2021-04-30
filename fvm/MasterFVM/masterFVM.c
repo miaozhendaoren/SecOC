@@ -1,15 +1,15 @@
 // #include "i2c.h"
+#include <string.h>
 #include "masterFVM.h"
 #include "MacGenerate.h"
 #include "Csm_Types.h"
-#include "Compiler_Cfg.h"
+#include "../../Compiler_Cfg.h"
 #include "MasterFVM_Cfg.h"
 // #include "usart.h"
 // #include "fvm_conf.h"
 
 #define ADDR_24LCxx_Write 0xA0
 #define ADDR_24LCxx_Read 0xA1
-#define NULL 0
 
 uint8 trip[3];			  //初始化时从非易失性存储器中获得并+1后再存回非易失性存储器， 低位先占满8字节 高位再占
 						  //例如  TripCntLength=11  且trip=0x04 0xff       [0000 0100][1111 1111][]
@@ -144,7 +144,7 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 	}
 	else
 	{
-		uint8 data_reset[2] = current_reset.resetdata;
+		uint8* data_reset = current_reset.resetdata;
 		data_reset_num = data_reset[0];
 		data_reset_num <<= 8;
 		data_reset_num += data_reset[1];
@@ -176,7 +176,7 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 	uint8 mac_length[8];
 	memset(mac, 0, sizeof(mac));
 	memset(mac_length, 0, sizeof(mac_length));
-	Csm_MacGenerate(jobId, mode, data_generate_mac, 16 + TripCntLength + ResetCntLength, mac, mac_length);
+//	Csm_MacGenerate(jobId, mode, data_generate_mac, 16 + TripCntLength + ResetCntLength, mac, mac_length);
 	uint64 num_mac;
 	for (int i = 0; i < 8; ++i)
 	{
@@ -295,7 +295,7 @@ MasterFVM_changestate(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId)
 	tmp = &confirmECU[TxPduId];
 	tmp->state = 1;
 	PduInfoType *info;
-	CanIf_Transmit(tmp->ackv, info);
+//	CanIf_Transmit(tmp->ackv, info);
 }
 
 uint8 firsttrip = 0;	  //标记是否发送过trip
@@ -338,7 +338,7 @@ MasterFVM_MainTx(void)
 	if (firsttrip == 0)
 	{
 		MasterFVM_getTripValue(info);
-		CanIf_Transmit(trip_can_id, info);
+//		CanIf_Transmit(trip_can_id, info);
 		firsttrip = 1;
 	}
 
@@ -364,13 +364,13 @@ MasterFVM_MainTx(void)
 					if (resentTripTime == triptxlimit)
 					{ //达到重发上限
 						info->SduDataPtr = NULL;
-						CanIf_Transmit(errorcanid, info);
+//						CanIf_Transmit(errorcanid, info);
 						triperrorlabel = 1; //多次发送trip都失败 =1
 					}
 					else
 					{
 						MasterFVM_getTripValue(info);
-						CanIf_Transmit(trip_can_id, info);
+//						CanIf_Transmit(trip_can_id, info);
 						resendTriptag = 0;
 						windowTimetag = 0;
 					}
@@ -379,7 +379,7 @@ MasterFVM_MainTx(void)
 				{ // resendtag==0  不需要重发，发送通知报文，开始按周期发送同步消息
 					info->SduDataPtr = NULL;
 					info->SduLength = 8;
-					CanIf_Transmit(notifycanid, info);
+//					CanIf_Transmit(notifycanid, info);
 					syn_for_trip = 1;
 					windowTimetag = 0;
 				}
@@ -399,7 +399,7 @@ MasterFVM_MainTx(void)
 				{
 
 					MasterFVM_getResetValue(i, info);
-					CanIf_Transmit(notifycanid, info);
+//					CanIf_Transmit(notifycanid, info);
 					resetCnt[i].resetSyntag = 0; //重新计数
 					break;
 				}

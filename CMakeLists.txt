@@ -9,5 +9,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(LIBRARIES gtest gtest_main pthread)
 
 
-add_executable(master_test master_test.cpp)
+add_executable(master_test
+        test.cpp
+        master_test.cpp
+        slave_test.cpp
+        ./fvm/MasterFVM/masterFVM.h
+        ./fvm/MasterFVM/masterFVM.c
+        )
 target_link_libraries(master_test ${LIBRARIES})
