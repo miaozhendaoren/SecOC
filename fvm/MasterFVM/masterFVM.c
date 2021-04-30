@@ -98,7 +98,7 @@ uint32 jobId = 2333;			   // 自定义
 Crypto_OperationModeType mode = 3; // 自定义
 ResetCnt_Type current_reset;
 
-void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength, uint8 ResetCntLength)
+void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 tripCntLength, uint8 ResetCntLength)
 {
 	uint8 can_data[8];
 	memset(can_data, 0, sizeof(can_data));
@@ -118,7 +118,7 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 	data_trip = trip[0];
 	data_trip <<= 8;
 	data_trip += trip[1];
-	data_trip <<= (16 - TripCntLength);
+	data_trip <<= (16 - tripCntLength);
 
 	//向生成mac的原始数据加入trip
 	data_generate_mac[2] = (uint8)(data_trip >> 8);
@@ -176,13 +176,13 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 	uint8 mac_length[8];
 	memset(mac, 0, sizeof(mac));
 	memset(mac_length, 0, sizeof(mac_length));
-//	Csm_MacGenerate(jobId, mode, data_generate_mac, 16 + TripCntLength + ResetCntLength, mac, mac_length);
-	uint64 num_mac;
+//	Csm_MacGenerate(jobId, mode, data_generate_mac, 16 + tripCntLength + ResetCntLength, mac, mac_length);
+	uint64 num_mac = 0;
 	for (int i = 0; i < 8; ++i)
 	{
 		num_mac += mac[7 - i] << (8 * i);
 	}
-	num_mac >>= (16 + TripCntLength + ResetCntLength);
+	num_mac >>= (16 + tripCntLength + ResetCntLength);
 
 	uint8 mac_index = 0;
 	// 数据重排
@@ -197,7 +197,7 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 			{
 				if (!is_k(can_data[i], j))
 				{
-					if (first)
+					if (!first)
 					{
 						first = 1;
 						can_data[i] = set_k(can_data[i], j);
@@ -235,7 +235,7 @@ void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 TripCntLength
 		}
 	}
 
-	PduInfoPtr = can_data;
+    PduInfoPtr = (const PduInfoType *) can_data;
 }
 
 FUNC(void, MASTER_CODE)
@@ -334,7 +334,7 @@ MasterFVM_MainTx(void)
 	*/
 
 	unsigned char i;
-	PduInfoType *info;
+	PduInfoType *info = NULL;
 	if (firsttrip == 0)
 	{
 		MasterFVM_getTripValue(info);
