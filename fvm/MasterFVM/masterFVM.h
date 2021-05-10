@@ -6,7 +6,7 @@
 
 uint8 length(uint8 num);
 uint8 set_k(uint8 num, uint8 k);
-uint8 is_k(uint8 num, uint8 k);
+uint8 is_k(uint64 num, uint8 k);
 void get_value(uint16 can_id, const PduInfoType *PduInfoPtr, uint8 tripCntLength, uint8 ResetCntLength);
 
 // void MasterFVM_Init(void);
