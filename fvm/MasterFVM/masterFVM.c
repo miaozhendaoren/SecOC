@@ -61,10 +61,6 @@ MasterFVM_Init(void)
 
 	// HAL_I2C_Mem_Read(&hi2c1, ADDR_24LCxx_Read, 0, I2C_MEMADD_SIZE_8BIT, trip, 2, 0xff); //读取2字节的trip
 
-	// 表面Read
-	trip[1] = 153;
-	trip[0] = 222;
-
 	if (trip[1] == 255)
 	{ //低位满，需进位
 		if (trip[0] == 255)
@@ -332,7 +328,6 @@ MasterFVM_MainTx(void)
 		4.reset同步：
 			每轮各reset的tag+1， 若达到阈值则调用getResetValue() 发送reset同步消息
 	*/
-
 	unsigned char i;
 	PduInfoType *info = NULL;
 	if (firsttrip == 0)

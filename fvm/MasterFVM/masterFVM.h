@@ -3,7 +3,8 @@
 #include "MasterFVM_Cfg.h"
 #include "../../Compiler.h"
 
-
+uint8 trip[3];
+uint8 TripCntLength;
 uint8 length(uint8 num);
 uint8 set_k(uint8 num, uint8 k);
 uint8 is_k(uint64 num, uint8 k);
