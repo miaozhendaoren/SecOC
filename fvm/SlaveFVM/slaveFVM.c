@@ -210,7 +210,7 @@ FVM_updateReset(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
 //下面两个函数是sender slave的部分
 
 /**
- * 获取新鲜值及 裁剪新鲜值
+ * 获取新鲜值及裁剪新鲜值
  * 	1.根据SecOCFreshnessValueID 作为索引找到需要对应的 resetCnt[id], preTrip, msgCnt[]
  * 
  * 2.通过比较各计数器上一次发送值和当前值，构造新鲜值
@@ -246,7 +246,7 @@ FvM_GetTxFreshnessTruncData(
 //下面两个函数是receiver slave的部分
 
 /**
- * 1.若SecOCTruncatedFreshnessValueLength ==SecOCFreshnessValueLength   将SecOCTruncatedFreshnessValue 复制到 SecOCFreshnessValue
+ * 1.若 SecOCTruncatedFreshnessValueLength == SecOCFreshnessValueLength 将 SecOCTruncatedFreshnessValue 复制到 SecOCFreshnessValue
  * 2.根据SecOCAuthVerifyAttempts依次比较表格中不同的format：
 	依次比较resetflag（根据SecOCAuthVerifyAttempts值）: 
 	    若不满足条件,SecOCAuthVerifyAttempts+1, 重新进行2.1, 若SecOCAuthVerifyAttempts=5了退出

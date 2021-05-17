@@ -18,7 +18,7 @@ FVM_updateTrip(P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr);
 
 // Std_ReturnType FVM_updateReset(PduIdType TxPduId, const PduInfoType* PduInfoPtr);  //更新reset值
 FUNC(VAR(Std_ReturnType,STD_TYPES_VAR),SLAVE_CODE)
-FVM_updateReset(VAR(PduIdType,COMSTACK_TYPES_VAR) TxPduId,P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr)
+FVM_updateReset(VAR(PduIdType,COMSTACK_TYPES_VAR) TxPduId,P2CONST(PduInfoType,SLAVE_CODE,SLAVE_APPL_CONST) PduInfoPtr);
 
 // Std_ReturnType FVM_GetTxFreshness (
 // 	uint16 SecOCFreshnessValueID,
