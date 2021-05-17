@@ -23,13 +23,13 @@ ResetCntS_Type resetCnt[] = {
         {
                 .resetdata = resetData,
                 .preresetdata = preresetData,
-                .ResetCntLengthgth = 15,
+                .ResetCntLength = 15,
 
         },
         {
                 .resetdata = resetData,
                 .preresetdata = preresetData,
-                .ResetCntLengthgth = 17,
+                .ResetCntLength = 17,
                 .resetcanid = 0x66
         }
 };

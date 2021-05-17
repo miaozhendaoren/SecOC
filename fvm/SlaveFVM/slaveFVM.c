@@ -70,7 +70,7 @@ FVM_Syn_check(void) {
 
 uint16 tripcanid = 0x2bd; //可配置
 uint8 trip[3]; // trip报文
-uint8 TripCntLengthgth = 16; //可配置
+uint8 TripCntLength = 16; //可配置
 uint16 ackid = 0x2be; //返回的ack报文  可配置
 
 /**
@@ -78,13 +78,13 @@ uint16 ackid = 0x2be; //返回的ack报文  可配置
  * 1.若收到过ack确认报文证明自己的ack被Master接收，直接结束
  * 
  * 2.解析收到的trip报文，重新构造验证mac所需的原始数据dataptr
- * PduInfoPtr.data = trip(TripCntLengthgth) + reset(1bit)+ mac(64bit-TripCntLengthgth-1);
- * char *dataptr 组成为  tripcanid[2](tripcanid拆分成两个char)+trip(TripCntLengthgth)+reset(1bit)：值为1 + padding0;
+ * PduInfoPtr.data = trip(TripCntLength) + reset(1bit)+ mac(64bit-TripCntLength-1);
+ * char *dataptr 组成为  tripcanid[2](tripcanid拆分成两个char)+trip(TripCntLength)+reset(1bit)：值为1 + padding0;
  * 在trip和reset计数器连接的总bit数构不成1个char时，在后面补0
- * 例如  TripCntLengthgth=12  [ 0x02 0xbd 0x00 0x14]  [0000 0100 1011 1101 0000 0000 0001 0100]
+ * 例如  TripCntLength=12  [ 0x02 0xbd 0x00 0x14]  [0000 0100 1011 1101 0000 0000 0001 0100]
  * 
  * 3.调用Csm_MacVerify(uint32 jobId, Crypto_OperationModeType mode,uint8* dataPtr,uint32 dataLength,uint8* macPtr,uint32 macLength,uint8* verifyPtr);
- * 若验证通过，使用verifyPtr(trip(TripCntLengthgth)+1(1bit))更新trip值和reset值，
+ * 若验证通过，使用verifyPtr(trip(TripCntLength)+1(1bit))更新trip值和reset值，
  * info->SduDataPtr = NULL;
  * info->SduLength=8;
  * 并调用CanIf_Transmit(ackid, info); 
@@ -100,20 +100,20 @@ FVM_updateTrip(P2CONST(PduInfoType, SLAVE_CODE, SLAVE_APPL_CONST)PduInfoPtr) {
     uint8 data = *PduInfoPtr->SduDataPtr;
 
     // trip
-    for (int i = 1; i <= TripCntLengthgth; i++) {
+    for (int i = 1; i <= TripCntLength; i++) {
         int index = (i + 8 - 1) / 8 - 1;
         if (is_k(data, i))
             trip[index] = set_k(trip[index], i % 8);
     }
 
     // reset
-    if (is_k(data, TripCntLengthgth + 1))
+    if (is_k(data, TripCntLength + 1))
         trip[2] = set_k(trip[2], 1);
 
     // mac
     uint8 *mac;
-    uint32 macLength = 64 - TripCntLengthgth - 1;
-    for (int i = TripCntLengthgth + 1; i < 64; i++) {
+    uint32 macLength = 64 - TripCntLength - 1;
+    for (int i = TripCntLength + 1; i < 64; i++) {
         int index = (i + 8 - 1) / 8 - 1;
         if (is_k(data, i))
             trip[index] = set_k(trip[index], i % 8);
@@ -132,7 +132,7 @@ FVM_updateTrip(P2CONST(PduInfoType, SLAVE_CODE, SLAVE_APPL_CONST)PduInfoPtr) {
     // Csm验证
     if (Csm_MacVerify(jobId, mode, dataptr, 32, mac, macLength, verifyPtr) == E_NOT_OK) return E_NOT_OK;
 
-    verifyPtr(TripCntLengthgth + 1);
+    verifyPtr(TripCntLength + 1);
     PduInfoPtr->SduDataPtr = NULL;
     PduInfoPtr->SduLength = 8;
     CanIf_Transmit(ackid, PduInfoPtr);
@@ -148,13 +148,13 @@ uint16 error_id = 0x100; //报错报文id   可配置
  * 1.先判断TxPduId 若>=NUM_RESET， 则直接退出;
  * 
  * 2.解析收到的reset报文，重新构造验证mac所需的原始数据dataptr
- * PduInfoPtr.data = reset(ResetCntLengthgth)+ mac(64bit-ResetCntLengthgth);
+ * PduInfoPtr.data = reset(ResetCntLength)+ mac(64bit-ResetCntLength);
  * char *dataptr 组成为
- * resetcanid[2](reset拆分成两个char, 由TxPduId作为索引找到)+trip(TripCntLengthgth)+reset(ResetCntLengthgth) + padding0;
+ * resetcanid[2](reset拆分成两个char, 由TxPduId作为索引找到)+trip(TripCntLength)+reset(ResetCntLength) + padding0;
  * 在trip和reset计数器连接的总bit数构不成1个char时，在后面补0
  * 
  * 3.调用Csm_MacVerify(uint32 jobId, Crypto_OperationModeType mode,uint8* dataPtr,uint32 dataLength,uint8* macPtr,uint32 macLength,uint8* verifyPtr);
- * 若验证通过，使用verifyPtr（trip(TripCntLengthgth)+1(1bit)）更新trip值和reset值
+ * 若验证通过，使用verifyPtr（trip(TripCntLength)+1(1bit)）更新trip值和reset值
  * 
  * 4.验证失败不更新 
 */
@@ -167,20 +167,20 @@ FVM_updateReset(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
     uint8 data = *PduInfoPtr->SduDataPtr;
 
     // trip
-    for (int i = 1; i <= TripCntLengthgth; i++) {
+    for (int i = 1; i <= TripCntLength; i++) {
         int index = (i + 8 - 1) / 8 - 1;
         if (is_k(data, i))
             trip[index] = set_k(trip[index], i % 8);
     }
 
     // reset
-    if (is_k(data, TripCntLengthgth + 1))
+    if (is_k(data, TripCntLength + 1))
         trip[2] = set_k(trip[2], 1);
 
     // mac
     uint8 *mac;
-    uint32 macLength = 64 - TripCntLengthgth - 1;
-    for (int i = TripCntLengthgth + 1; i < 64; i++) {
+    uint32 macLength = 64 - TripCntLength - 1;
+    for (int i = TripCntLength + 1; i < 64; i++) {
         int index = (i + 8 - 1) / 8 - 1;
         if (is_k(data, i))
             trip[index] = set_k(trip[index], i % 8);
@@ -197,10 +197,9 @@ FVM_updateReset(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
     }
 
     // Csm验证
-    if (Csm_MacVerify(jobId, mode, dataptr, 32, mac, macLength, verifyPtr) == E_NOT_OK)
-        return E_NOT_OK;
+    if (Csm_MacVerify(jobId, mode, dataptr, 32, mac, macLength, verifyPtr) == E_NOT_OK) return E_NOT_OK;
 
-    verifyPtr(TripCntLengthgth + 1);
+    verifyPtr(TripCntLength + 1);
     PduInfoPtr->SduDataPtr = NULL;
     PduInfoPtr->SduLength = 8;
 
@@ -211,14 +210,14 @@ FVM_updateReset(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
 
 /**
  * 获取新鲜值及裁剪新鲜值
- * 	1.根据SecOCFreshnessValueID 作为索引找到需要对应的 resetCnt[id], preTrip, msgCnt[]
+ * 1.根据SecOCFreshnessValueID 作为索引找到需要对应的 resetCnt[id], preTrip, msgCnt[]
  * 
  * 2.通过比较各计数器上一次发送值和当前值，构造新鲜值
- * 参考图
+ *  参考图
  * 
  * 3.将新鲜值按照 trip reset msg进行构造 SecOCFreshnessValue
  * 
- * 4.根据 SecOCTruncatedFreshnessValueLength 长度，截取msg中后 (SecOCTruncatedFreshnessValueLength-2) 比特位长度+2比特位reset flag（reset后两位）构造SecOCTruncatedFreshnessValue
+ * 4.根据 SecOCTruncatedFreshnessValueLength 长度，截取msg中后 (SecOCTruncatedFreshnessValueLength-2) 比特位长度 + 2 比特位reset flag（reset后两位）构造SecOCTruncatedFreshnessValue
  * 参考图
 */
 FUNC(VAR(Std_ReturnType, STD_TYPES_VAR), SLAVE_CODE)
@@ -227,7 +226,7 @@ FVM_GetTxFreshness(
         P2VAR(uint8, SLAVE_CODE, SLAVE_APPL_DATA)SecOCFreshnessValue,
         P2VAR(uint32, SLAVE_CODE, SLAVE_APPL_DATA)SecOCFreshnessValueLength
 ) {
-
+    resetCnt[SecOCFreshnessValueID]
 }
 
 
@@ -282,17 +281,16 @@ FVM_GetRxFreshnessAuthData(
 
 /**
  * 根据完整SecOCFreshnessValue 更新
- * SecOCFreshnessValue包括trip(TripCntLengthgth) reset(ResetCntLengthgth) msg(MsgCntLengthgth) resetflag(ResetFlagLength)
+ * SecOCFreshnessValue包括trip(TripCntLength) reset(ResetCntLength) msg(MsgCntLengthgth) resetflag(ResetFlagLength)
  * 由于长度是比特长度因此需要将各计数器的值分离出来，从而更新对应值：
- * preTrip[3*SecOCFreshnessValueID] =  trip(TripCntLengthgth)
- * resetCnt[SecOCFreshnessValueID]->preresetData[3*SecOCFreshnessValueID] = reset(ResetCntLengthgth)
- * msgCnt[SecOCFreshnessValueID]->premsgdata[3*SecOCFreshnessValueID] =msg(MsgCntLengthgth)
+ * preTrip[3*SecOCFreshnessValueID] =  trip(TripCntLength)
+ * resetCnt[SecOCFreshnessValueID] -> preresetData[3*SecOCFreshnessValueID] = reset(ResetCntLength)
+ * msgCnt[SecOCFreshnessValueID] -> premsgdata[3*SecOCFreshnessValueID] =msg(MsgCntLengthgth)
 */
 //需保证报文没被取消
 FUNC(void, SLAVE_CODE)
 FVM_updatePreValue(VAR(PduIdType, COMSTACK_TYPES_VAR) TxPduId,
                    P2CONST(PduInfoType, SLAVE_CODE, SLAVE_APPL_CONST)PduInfoPtr) {
-
 
 }
 

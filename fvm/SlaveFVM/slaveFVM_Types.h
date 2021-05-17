@@ -11,7 +11,7 @@ typedef struct {
 typedef struct {
     uint8* resetdata;
     uint8* preresetdata;
-	uint8 ResetCntLengthgth;
+	uint8 ResetCntLength;
     uint16 resetcanid;
 }ResetCntS_Type;
 
