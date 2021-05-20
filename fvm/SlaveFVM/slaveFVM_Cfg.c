@@ -56,12 +56,12 @@ MsgCntS_Type msgCnt[] = {
         {
                 .msgdata=msgData,
                 .premsgdata=preMsgData,
-                .MsgCntLengthgth=24
+                .MsgCntLength=24
         },
         {
                 .msgdata=msgData,
                 .premsgdata=preMsgData,
-                .MsgCntLengthgth=26
+                .MsgCntLength=26
         }
 };
 

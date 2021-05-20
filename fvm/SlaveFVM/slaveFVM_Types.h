@@ -27,7 +27,7 @@ typedef struct {
 typedef struct {
     uint8* msgdata;
     uint8* premsgdata;
-	uint8 MsgCntLengthgth;
+	uint8 MsgCntLength;
 }MsgCntS_Type;
 
 #endif
